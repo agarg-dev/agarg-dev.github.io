@@ -25,8 +25,24 @@ My research focuses on **Machine Learning Interpretability** and **Large Languag
 
 Previously, I was a Software Engineer at **Salesforce** and a Researcher at **Harvard University**.
 
+
 ## News
 
 * **Dec 2025:** Submitted our paper *"Cross-Layer Discrete Concept Discovery"* to TMLR.
 * **Sep 2025:** Started my PhD at the University of Calgary.
 * **Mar 2023:** Completed my tenure as a Software Engineer at Salesforce.
+
+
+## Teaching & Academic Service
+
+I am an active reviewer for **Transactions on Machine Learning Research (TMLR)**.
+
+I have served as a teaching assistant for the following courses:
+
+* **Applied Machine Learning and Predictive Analytics (ENEL 682)**, Winter 2025 & 2026, University of Calgary
+* **Database Systems (CSCI 585)**, Fall 2021, USC *(Course Producer)*
+
+## Scholarships & Awards
+
+* **Eyes High Doctoral Recruitment Scholarship** (2025 – 2029)
+  <br> A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential.
