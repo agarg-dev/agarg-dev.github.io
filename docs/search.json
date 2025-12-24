@@ -32,14 +32,14 @@
     "href": "index.html",
     "title": "Ankur Garg",
     "section": "",
-    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. [Advisor Name]. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
   },
   {
     "objectID": "index.html#bio",
     "href": "index.html#bio",
     "title": "Ankur Garg",
     "section": "",
-    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. [Advisor Name]. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
   },
   {
     "objectID": "index.html#news",
@@ -49,29 +49,43 @@
     "text": "News\n\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery” to TMLR.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
   },
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
+    "objectID": "index.html#teaching-academic-service",
+    "href": "index.html#teaching-academic-service",
+    "title": "Ankur Garg",
+    "section": "Teaching & Academic Service",
+    "text": "Teaching & Academic Service\nI am an active reviewer for Transactions on Machine Learning Research (TMLR).\nI have served as a teaching assistant for the following courses:\n\nApplied Machine Learning and Predictive Analytics (ENEL 682), Winter 2025 & 2026, University of Calgary\nDatabase Systems (CSCI 585), Fall 2021, USC (Course Producer)"
+  },
+  {
+    "objectID": "index.html#scholarships-awards",
+    "href": "index.html#scholarships-awards",
+    "title": "Ankur Garg",
+    "section": "Scholarships & Awards",
+    "text": "Scholarships & Awards\n\nEyes High Doctoral Recruitment Scholarship (2025 – 2029)  A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential."
+  },
+  {
+    "objectID": "research.html",
+    "href": "research.html",
     "title": "Research",
     "section": "",
     "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
   },
   {
-    "objectID": "projects.html#selected-publications",
-    "href": "projects.html#selected-publications",
+    "objectID": "research.html#selected-publications",
+    "href": "research.html#selected-publications",
     "title": "Research",
     "section": "",
     "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
   },
   {
-    "objectID": "projects.html#all-publications",
-    "href": "projects.html#all-publications",
+    "objectID": "research.html#all-publications",
+    "href": "research.html#all-publications",
     "title": "Research",
     "section": "All Publications",
     "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Anonymous Authors (Under Review). 2025. arXiv:2506.20040.  [PDF, Code]\nHandwritten Text to Editable Text Document  Ankur Garg, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
   },
   {
-    "objectID": "projects.html#research-projects",
-    "href": "projects.html#research-projects",
+    "objectID": "research.html#research-projects",
+    "href": "research.html#research-projects",
     "title": "Research",
     "section": "Research Projects",
     "text": "Research Projects\n\nAutoCorrect for MultiLingual Text (2021)  Advisor: Prof. Saty Raghavachary (USC)\n\nObjective: Address spelling variation challenges in Transliterated Hindi-English code-mixed text.\nMethod: Engineered a novel two-stage model using a Conditional Random Field (CRF) for language identification and a BILSTM-BERT model for context-aware auto-correction.\nResult: Created a custom 6,000-word dataset and achieved a 69.3% F1 score.\n\nMulti-Media Morse Code Recognition (2020)\n\nObjective: Enable patient-caregiver communication via Morse code recognition across diverse sound mediums (e.g., finger taps, claps).\nMethod: Trained a CRNN-CTC model on 60 hours of audio data, enhanced with Gaussian noise for robustness.\nResult: Achieved a 98.37% F1 score on untrained mediums, significantly surpassing single-medium baselines (2%)."
