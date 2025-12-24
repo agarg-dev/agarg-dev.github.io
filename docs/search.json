@@ -1,0 +1,86 @@
+[
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "Download Full CV"
+  },
+  {
+    "objectID": "cv.html#education",
+    "href": "cv.html#education",
+    "title": "Curriculum Vitae",
+    "section": "Education",
+    "text": "Education\nUniversity of Calgary | Calgary, Canada  PhD in Electrical and Software Engineering | Current  Advisor: Prof. Samira Ebrahimi Kahou  GPA: 4.0/4.0\nUniversity of Southern California | Los Angeles, USA  M.S. in Computer Science | 2021  GPA: 4.0/4.0  Coursework: Machine Learning, Deep Learning, NLP, Information Retrieval, Algorithms\nSRM Institute of Science and Technology | Chennai, India  B.Tech. in Computer Science and Engineering | 2019  Grade: 90.97/100"
+  },
+  {
+    "objectID": "cv.html#professional-experience",
+    "href": "cv.html#professional-experience",
+    "title": "Curriculum Vitae",
+    "section": "Professional Experience",
+    "text": "Professional Experience\nSalesforce | Software Engineer | San Francisco, CA Jan 2022 – March 2023\n\nHyperforce Security: Engineered features to control certificate renewal and supported the transition to Hyperforce, allowing security-sensitive customers to remain on 1st-party data centers.\nInfrastructure Security: Integrated Cloudflare APIs (Web Application Firewall) into the workflow to enhance security against malicious incoming traffic.\nTesting & Quality: Took initiative to write unit and integration tests using Spring, increasing code coverage by 60-75% for critical classes.\n\nHarvard University | Computer Scientist Trainee Sept 2021 – Dec 2021\n\nOptimization: Implemented scripts for streamlined access to Docker THOMAS containers using Boutiques.\nImpact: Resulted in a 200% reduction in workload overhead for researchers accessing containerized tools.\n\nApple | Machine Learning Intern | Cupertino, CA May 2021 – Aug 2021\n\nIssue Routing: Developed a multi-class classification system to automatically route user-reported issues to the appropriate engineering teams.\nNLP Pipeline: Performed data analysis on class skewness and utilized Sentence Embeddings and TF-IDF to extract semantic features from issue logs.\nResults: Achieved an 88% F1 Score on team routing and 95% accuracy on crash/non-crash detection using Random Forest models."
+  },
+  {
+    "objectID": "cv.html#technical-skills",
+    "href": "cv.html#technical-skills",
+    "title": "Curriculum Vitae",
+    "section": "Technical Skills",
+    "text": "Technical Skills\n\nLanguages: Python, Java, C/C++, SQL, TypeScript\nMachine Learning: PyTorch, TensorFlow, Scikit-learn, HuggingFace Transformers, Pandas, NumPy\nWeb & Tools: Docker, Git, Angular, Node.js, Spring Boot, AWS, Jenkins"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ankur Garg",
+    "section": "",
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. [Advisor Name]. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+  },
+  {
+    "objectID": "index.html#bio",
+    "href": "index.html#bio",
+    "title": "Ankur Garg",
+    "section": "",
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. [Advisor Name]. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+  },
+  {
+    "objectID": "index.html#news",
+    "href": "index.html#news",
+    "title": "Ankur Garg",
+    "section": "News",
+    "text": "News\n\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery” to TMLR.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Research",
+    "section": "",
+    "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+  },
+  {
+    "objectID": "projects.html#selected-publications",
+    "href": "projects.html#selected-publications",
+    "title": "Research",
+    "section": "",
+    "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+  },
+  {
+    "objectID": "projects.html#all-publications",
+    "href": "projects.html#all-publications",
+    "title": "Research",
+    "section": "All Publications",
+    "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Anonymous Authors (Under Review). 2025. arXiv:2506.20040.  [PDF, Code]\nHandwritten Text to Editable Text Document  Ankur Garg, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
+  },
+  {
+    "objectID": "projects.html#research-projects",
+    "href": "projects.html#research-projects",
+    "title": "Research",
+    "section": "Research Projects",
+    "text": "Research Projects\n\nAutoCorrect for MultiLingual Text (2021)  Advisor: Prof. Saty Raghavachary (USC)\n\nObjective: Address spelling variation challenges in Transliterated Hindi-English code-mixed text.\nMethod: Engineered a novel two-stage model using a Conditional Random Field (CRF) for language identification and a BILSTM-BERT model for context-aware auto-correction.\nResult: Created a custom 6,000-word dataset and achieved a 69.3% F1 score.\n\nMulti-Media Morse Code Recognition (2020)\n\nObjective: Enable patient-caregiver communication via Morse code recognition across diverse sound mediums (e.g., finger taps, claps).\nMethod: Trained a CRNN-CTC model on 60 hours of audio data, enhanced with Gaussian noise for robustness.\nResult: Achieved a 98.37% F1 score on untrained mediums, significantly surpassing single-medium baselines (2%)."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  }
+]

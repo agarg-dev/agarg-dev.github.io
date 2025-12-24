@@ -1,0 +1,48 @@
+---
+title: "Research"
+---
+
+## Selected Publications
+
+::: {.selected-pub}
+### **Cross-Layer Discrete Concept Discovery (CLVQ-VAE)**
+*Under Review (TMLR)* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
+
+:::: {layout="[45, 55]"}
+
+::: {#first-column}
+![](images/clvq_vae.png)
+:::
+
+::: {#second-column}
+We introduce **CLVQ-VAE**, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our **Adaptive Residual Encoder** identifies interpretable concepts that achieve **78% model alignment** in human evaluations and **93% faithfulness** in ablation studies.
+:::
+
+::::
+:::
+
+---
+
+## All Publications
+
+* **Cross-Layer Discrete Concept Discovery for Interpreting Language Models**
+  <br> *Anonymous Authors (Under Review)*. 2025. arXiv:2506.20040.
+  <br> [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
+
+* **Handwritten Text to Editable Text Document**
+  <br> **Ankur Garg**, D. Malathi. 2020. *International Journal of Advanced Science and Technology*, Vol. 29, No. 2, pp. 4707-4712.
+  <br> [[Paper](http://sersc.org/journals/index.php/IJAST/article/view/23456)]
+  <br> *Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve **84% accuracy** on a 1,000-word test dataset.*
+
+## Research Projects
+
+* **AutoCorrect for MultiLingual Text** (2021)
+  <br> *Advisor: Prof. Saty Raghavachary (USC)*
+  * **Objective:** Address spelling variation challenges in Transliterated Hindi-English code-mixed text.
+  * **Method:** Engineered a novel two-stage model using a **Conditional Random Field (CRF)** for language identification and a **BILSTM-BERT** model for context-aware auto-correction.
+  * **Result:** Created a custom 6,000-word dataset and achieved a **69.3% F1 score**.
+
+* **Multi-Media Morse Code Recognition** (2020)
+  * **Objective:** Enable patient-caregiver communication via Morse code recognition across diverse sound mediums (e.g., finger taps, claps).
+  * **Method:** Trained a **CRNN-CTC model** on 60 hours of audio data, enhanced with Gaussian noise for robustness.
+  * **Result:** Achieved a **98.37% F1 score** on untrained mediums, significantly surpassing single-medium baselines (2%).

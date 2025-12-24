@@ -1,0 +1,29 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Ankur Garg"  # Your name in the top left
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: projects.qmd
+        text: Projects
+      - href: cv.qmd
+        text: CV
+    right:
+      - icon: github
+        href: https://github.com/agarg-dev
+      - icon: linkedin
+        href: https://www.linkedin.com/in/ankurgarg96/
+      - icon: envelope
+        href: mailto:ankurgarg.0496@gmail.com
+
+format:
+  html:
+    theme:
+          light: cosmo   # Your current clean light theme
+          dark: darkly    # A professional dark theme (alternatives: darkly, cyborg)
+    css: styles.css
+    toc: true

@@ -1,0 +1,19 @@
+/* Style for Selected Publications Box */
+.selected-pub {
+  /* Use a semi-transparent border so it looks good on white OR black backgrounds */
+  border: 1px solid rgba(128, 128, 128, 0.4); 
+  border-radius: 10px;       
+  padding: 20px;             
+  margin-bottom: 30px;       
+  
+  /* Transparent background lets the theme color shine through */
+  background-color: transparent; 
+}
+
+/* Ensure images fit nicely */
+.selected-pub img {
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(128, 128, 128, 0.2); /* Subtle border for image too */
+  border-radius: 5px;
+}

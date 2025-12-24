@@ -1,0 +1,57 @@
+---
+title: "Curriculum Vitae"
+---
+
+<div style="text-align: right">
+  <a href="files/cv.pdf" class="btn btn-primary" target="_blank" role="button">
+    <i class="bi bi-file-earmark-pdf"></i> Download Full CV
+  </a>
+</div>
+
+## Education
+
+**University of Calgary** | Calgary, Canada
+<br> *PhD in Electrical and Software Engineering* | *Current*
+<br> **Advisor:** Prof. Samira Ebrahimi Kahou
+<br> **GPA:** 4.0/4.0
+
+**University of Southern California** | Los Angeles, USA
+<br> *M.S. in Computer Science* | *2021*
+<br> **GPA:** 4.0/4.0
+<br> **Coursework:** Machine Learning, Deep Learning, NLP, Information Retrieval, Algorithms
+
+**SRM Institute of Science and Technology** | Chennai, India
+<br> *B.Tech. in Computer Science and Engineering* | *2019*
+<br> **Grade:** 90.97/100
+
+---
+
+## Professional Experience
+
+**Salesforce** | Software Engineer | *San Francisco, CA*
+*Jan 2022 – March 2023*
+
+* **Hyperforce Security:** Engineered features to control certificate renewal and supported the transition to Hyperforce, allowing security-sensitive customers to remain on 1st-party data centers.
+* **Infrastructure Security:** Integrated Cloudflare APIs (Web Application Firewall) into the workflow to enhance security against malicious incoming traffic.
+* **Testing & Quality:** Took initiative to write unit and integration tests using Spring, increasing code coverage by **60-75%** for critical classes.
+
+**Harvard University** | Computer Scientist Trainee
+*Sept 2021 – Dec 2021*
+
+* **Optimization:** Implemented scripts for streamlined access to Docker THOMAS containers using Boutiques.
+* **Impact:** Resulted in a **200% reduction** in workload overhead for researchers accessing containerized tools.
+
+**Apple** | Machine Learning Intern | *Cupertino, CA*
+*May 2021 – Aug 2021*
+
+* **Issue Routing:** Developed a multi-class classification system to automatically route user-reported issues to the appropriate engineering teams.
+* **NLP Pipeline:** Performed data analysis on class skewness and utilized Sentence Embeddings and TF-IDF to extract semantic features from issue logs.
+* **Results:** Achieved an **88% F1 Score** on team routing and **95% accuracy** on crash/non-crash detection using Random Forest models.
+
+---
+
+## Technical Skills
+
+* **Languages:** Python, Java, C/C++, SQL, TypeScript
+* **Machine Learning:** PyTorch, TensorFlow, Scikit-learn, HuggingFace Transformers, Pandas, NumPy
+* **Web & Tools:** Docker, Git, Angular, Node.js, Spring Boot, AWS, Jenkins

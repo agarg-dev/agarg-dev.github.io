@@ -1,0 +1,32 @@
+---
+title: "Ankur Garg"
+image: images/profile.jpg
+about:
+  template: trestles
+  image-shape: round
+  image-width: 10em
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/ankurgarg96
+    - icon: github
+      text: Github
+      href: https://github.com/agarg-dev
+    - icon: envelope
+      text: Email
+      href: mailto:ankurgarg.0496@gmail.com
+---
+
+## Bio
+
+I am a PhD student in the Department of Electrical and Software Engineering at the **University of Calgary**, advised by **Prof. [Advisor Name]**. I received my **M.S. in Computer Science** from the **University of Southern California**.
+
+My research focuses on **Machine Learning Interpretability** and **Large Language Models (LLMs)**. I am interested in deciphering the internal mechanisms of transformers to improve model transparency.
+
+Previously, I was a Software Engineer at **Salesforce** and a Researcher at **Harvard University**.
+
+## News
+
+* **Dec 2025:** Submitted our paper *"Cross-Layer Discrete Concept Discovery"* to TMLR.
+* **Sep 2025:** Started my PhD at the University of Calgary.
+* **Mar 2023:** Completed my tenure as a Software Engineer at Salesforce.
