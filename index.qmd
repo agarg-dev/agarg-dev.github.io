@@ -19,7 +19,7 @@ about:
 
 ## Bio
 
-I am a PhD student in the Department of Electrical and Software Engineering at the **University of Calgary**, advised by **Prof. [Advisor Name]**. I received my **M.S. in Computer Science** from the **University of Southern California**.
+I am a PhD student in the Department of Electrical and Software Engineering at the **University of Calgary**, advised by **Prof. Samira Ebrahimi Kahou**. I received my **M.S. in Computer Science** from the **University of Southern California**.
 
 My research focuses on **Machine Learning Interpretability** and **Large Language Models (LLMs)**. I am interested in deciphering the internal mechanisms of transformers to improve model transparency.
 
