@@ -35,7 +35,7 @@ We introduce **CLVQ-VAE**, a framework to interpret Large Language Models by col
   <br> *Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to **87.07%** (vs 83.21% baseline).*
 
 * **Handwritten Text to Editable Text Document**
-  <br> **Ankur Garg**, D. Malathi. 2020. *International Journal of Advanced Science and Technology*, Vol. 29, No. 2, pp. 4707-4712.
+  <br> **Ankur Garg**, Payal Deora, D. Malathi. 2020. *International Journal of Advanced Science and Technology*, Vol. 29, No. 2, pp. 4707-4712.
   <br> [[Paper](http://sersc.org/journals/index.php/IJAST/article/view/23456)]
   <br> *Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve **84% accuracy** on a 1,000-word test dataset.*
 
