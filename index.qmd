@@ -29,6 +29,7 @@ Previously, I was a Software Engineer at **Salesforce** and a Researcher at **Ha
 ## News
 
 * **Dec 2025:** Submitted our paper *"Cross-Layer Discrete Concept Discovery"* to TMLR.
+* **Oct 2025:** Presented our work *"Improving Pathology Foundation Models for Brain Tissue"* at the [AI in Medicine Symposium](https://cumming.ucalgary.ca/office/ofd/events-and-programming/ai-medicine-symposium-beyond-algorithm) and the [Alberta BME Conference](https://schulich.ucalgary.ca/biomedical/news-events/annual-alberta-biomedical-engineering-conference).
 * **Sep 2025:** Started my PhD at the University of Calgary.
 * **Mar 2023:** Completed my tenure as a Software Engineer at Salesforce.
 

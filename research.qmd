@@ -29,6 +29,11 @@ We introduce **CLVQ-VAE**, a framework to interpret Large Language Models by col
   <br> *Anonymous Authors (Under Review)*. 2025. arXiv:2506.20040.
   <br> [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
 
+* **Improving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning**
+  <br> Abhishek Rajora, **Ankur Garg**, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.
+  <br> *[AI in Medicine Symposium: BEYOND THE ALGORITHM](https://cumming.ucalgary.ca/office/ofd/events-and-programming/ai-medicine-symposium-beyond-algorithm) and [Annual Alberta Biomedical Engineering Conference](https://schulich.ucalgary.ca/biomedical/news-events/annual-alberta-biomedical-engineering-conference), 2025*.
+  <br> *Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to **87.07%** (vs 83.21% baseline).*
+
 * **Handwritten Text to Editable Text Document**
   <br> **Ankur Garg**, D. Malathi. 2020. *International Journal of Advanced Science and Technology*, Vol. 29, No. 2, pp. 4707-4712.
   <br> [[Paper](http://sersc.org/journals/index.php/IJAST/article/view/23456)]

@@ -46,7 +46,7 @@
     "href": "index.html#news",
     "title": "Ankur Garg",
     "section": "News",
-    "text": "News\n\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery” to TMLR.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
+    "text": "News\n\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery” to TMLR.\nOct 2025: Presented our work “Improving Pathology Foundation Models for Brain Tissue” at the AI in Medicine Symposium and the Alberta BME Conference.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
   },
   {
     "objectID": "index.html#teaching-academic-service",
@@ -81,7 +81,7 @@
     "href": "research.html#all-publications",
     "title": "Research",
     "section": "All Publications",
-    "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Anonymous Authors (Under Review). 2025. arXiv:2506.20040.  [PDF, Code]\nHandwritten Text to Editable Text Document  Ankur Garg, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
+    "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Anonymous Authors (Under Review). 2025. arXiv:2506.20040.  [PDF, Code]\nImproving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning  Abhishek Rajora, Ankur Garg, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.  AI in Medicine Symposium: BEYOND THE ALGORITHM and Annual Alberta Biomedical Engineering Conference, 2025.  Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to 87.07% (vs 83.21% baseline).\nHandwritten Text to Editable Text Document  Ankur Garg, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
   },
   {
     "objectID": "research.html#research-projects",
