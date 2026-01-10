@@ -67,14 +67,14 @@
     "href": "research.html",
     "title": "Research",
     "section": "",
-    "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+    "text": "Under Review [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
   },
   {
     "objectID": "research.html#selected-publications",
     "href": "research.html#selected-publications",
     "title": "Research",
     "section": "",
-    "text": "Under Review (TMLR) [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+    "text": "Under Review [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
   },
   {
     "objectID": "research.html#all-publications",

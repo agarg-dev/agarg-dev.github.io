@@ -6,7 +6,7 @@ title: "Research"
 
 ::: {.selected-pub}
 ### **Cross-Layer Discrete Concept Discovery (CLVQ-VAE)**
-*Under Review (TMLR)* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
+*Under Review* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
 
 :::: {layout="[45, 55]"}
 
