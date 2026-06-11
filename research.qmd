@@ -36,7 +36,6 @@ We introduce **CLVQ-VAE**, a framework that interprets Large Language Models by 
 
 * **Handwritten Text to Editable Text Document**
   <br> **Ankur Garg**, Payal Deora, D. Malathi. 2020. *International Journal of Advanced Science and Technology*, Vol. 29, No. 2, pp. 4707-4712.
-  <br> [[Paper](http://sersc.org/journals/index.php/IJAST/article/view/23456)]
   <br> *Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve **84% accuracy** on a 1,000-word test dataset.*
 
 ## Research Projects
