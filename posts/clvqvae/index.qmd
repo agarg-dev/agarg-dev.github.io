@@ -16,7 +16,7 @@ This post accompanies our paper *Cross-Layer Discrete Concept Discovery for Inte
 [📄 Paper](https://arxiv.org/abs/2506.20040) · [💻 Code](https://github.com/agarg-dev/CLVQVAE)
 :::
 
-## Why is it so hard to see inside a transformer?
+## Why is it so hard to look inside a transformer?
 
 Large language models work remarkably well, but *how* they work remains opaque. A natural first instinct is to pick a layer, look at its activations, and try to assign meaning to individual neurons or directions. Unfortunately, the transformer architecture itself fights you on this.
 
@@ -25,7 +25,7 @@ The culprit is the **residual stream**. Every layer *adds* its contribution to a
 1. **Features get duplicated.** A feature written at layer 3 is still visible at layers 8, 10, and 12, so a single-layer analysis sees the same concept many times over.
 2. **Features get mixed.** The stream linearly superimposes many features on top of each other, so any single snapshot is a tangled sum of everything written so far.
 
-Sparse autoencoders (SAEs) attack the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in *continuous* space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses *negation* or it doesn't. That mismatch limits interpretability.
+Sparse autoencoders (SAEs) address the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in *continuous* space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses *negation* or it doesn't. This mismatch limits interpretability.
 
 ## Our idea: quantize the *transformation* between layers
 
@@ -37,7 +37,7 @@ Instead of asking "what is encoded at layer $l$?", we ask:
 
 ![Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.](../../images/clvq_vae.png){width=85% fig-align="center"}
 
-The framework has three components, each with a design choice that turned out to matter.
+The framework has three crucial components.
 
 ### 1. An adaptive residual encoder
 

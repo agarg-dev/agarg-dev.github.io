@@ -30,15 +30,15 @@
 </div>
 </div>
 </div>
-<section id="why-is-it-so-hard-to-see-inside-a-transformer" class="level2">
-<h2 class="anchored" data-anchor-id="why-is-it-so-hard-to-see-inside-a-transformer">Why is it so hard to see inside a transformer?</h2>
+<section id="why-is-it-so-hard-to-look-inside-a-transformer" class="level2">
+<h2 class="anchored" data-anchor-id="why-is-it-so-hard-to-look-inside-a-transformer">Why is it so hard to look inside a transformer?</h2>
 <p>Large language models work remarkably well, but <em>how</em> they work remains opaque. A natural first instinct is to pick a layer, look at its activations, and try to assign meaning to individual neurons or directions. Unfortunately, the transformer architecture itself fights you on this.</p>
 <p>The culprit is the <strong>residual stream</strong>. Every layer <em>adds</em> its contribution to a running representation, which means:</p>
 <ol type="1">
 <li><strong>Features get duplicated.</strong> A feature written at layer 3 is still visible at layers 8, 10, and 12, so a single-layer analysis sees the same concept many times over.</li>
 <li><strong>Features get mixed.</strong> The stream linearly superimposes many features on top of each other, so any single snapshot is a tangled sum of everything written so far.</li>
 </ol>
-<p>Sparse autoencoders (SAEs) attack the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in <em>continuous</em> space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses <em>negation</em> or it doesn't. That mismatch limits interpretability.</p>
+<p>Sparse autoencoders (SAEs) address the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in <em>continuous</em> space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses <em>negation</em> or it doesn't. This mismatch limits interpretability.</p>
 </section>
 <section id="our-idea-quantize-the-transformation-between-layers" class="level2">
 <h2 class="anchored" data-anchor-id="our-idea-quantize-the-transformation-between-layers">Our idea: quantize the <em>transformation</em> between layers</h2>
@@ -53,7 +53,7 @@
 <figcaption>Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.</figcaption>
 </figure>
 </div>
-<p>The framework has three components, each with a design choice that turned out to matter.</p>
+<p>The framework has three crucial components.</p>
 <section id="an-adaptive-residual-encoder" class="level3">
 <h3 class="anchored" data-anchor-id="an-adaptive-residual-encoder">1. An adaptive residual encoder</h3>
 <p>Pre-trained LM embeddings are already information-rich; a randomly initialized encoder that fully transforms them destroys that structure before training can recover it. But a frozen identity map limits what can be discovered. We interpolate between the two with a <em>learnable</em> mixing coefficient:</p>
