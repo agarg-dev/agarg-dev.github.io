@@ -15,7 +15,7 @@ title: "Research"
 :::
 
 ::: {#second-column}
-We introduce **CLVQ-VAE**, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our **Adaptive Residual Encoder** identifies interpretable concepts that achieve **78% model alignment** in human evaluations and **93% faithfulness** in ablation studies.
+We introduce **CLVQ-VAE**, a framework that interprets Large Language Models by collapsing redundant residual-stream features into a discrete codebook of concept vectors learned across a pair of layers. Unlike sparse autoencoders, each input maps to a *single* discrete concept rather than a linear combination of neurons. Across four models and twelve model-dataset settings, the discovered concepts are both faithful (a **93.2% accuracy drop** when the salient concept is ablated on RoBERTa/ERASER-Movie) and interpretable, reaching **78.2% model alignment** with human annotators and ranking first under an ensemble of LLM judges.
 :::
 
 ::::
