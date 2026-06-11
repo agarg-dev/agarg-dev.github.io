@@ -1,5 +1,152 @@
 [
   {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blog",
+    "section": "",
+    "text": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers\n\n\n\ninterpretability\n\nLLMs\n\nresearch\n\n\n\nHow we use vector quantization to collapse the redundant, mixed-up features of the residual stream into a compact set of human-interpretable concepts.\n\n\n\n\n\nJun 11, 2026\n\n10 min\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "posts/clvqvae/index.html",
+    "href": "posts/clvqvae/index.html",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "",
+    "text": "This post accompanies our paper Cross-Layer Discrete Concept Discovery for Interpreting Language Models (with Xuemin Yu, Hassan Sajjad, and Samira Ebrahimi Kahou). 📄 Paper · 💻 Code"
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#why-is-it-so-hard-to-see-inside-a-transformer",
+    "href": "posts/clvqvae/index.html#why-is-it-so-hard-to-see-inside-a-transformer",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Why is it so hard to see inside a transformer?",
+    "text": "Why is it so hard to see inside a transformer?\nLarge language models work remarkably well, but how they work remains opaque. A natural first instinct is to pick a layer, look at its activations, and try to assign meaning to individual neurons or directions. Unfortunately, the transformer architecture itself fights you on this.\nThe culprit is the residual stream. Every layer adds its contribution to a running representation, which means:\n\nFeatures get duplicated. A feature written at layer 3 is still visible at layers 8, 10, and 12, so a single-layer analysis sees the same concept many times over.\nFeatures get mixed. The stream linearly superimposes many features on top of each other, so any single snapshot is a tangled sum of everything written so far.\n\nSparse autoencoders (SAEs) attack the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in continuous space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses negation or it doesn't. That mismatch limits interpretability."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#our-idea-quantize-the-transformation-between-layers",
+    "href": "posts/clvqvae/index.html#our-idea-quantize-the-transformation-between-layers",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Our idea: quantize the transformation between layers",
+    "text": "Our idea: quantize the transformation between layers\nInstead of asking \"what is encoded at layer \\(l\\)?\", we ask:\n\nWhat concepts are needed to explain how the representation at layer \\(l\\) becomes the representation at layer \\(h\\)?\n\nCLVQ-VAE (Cross-Layer Vector Quantized Variational Autoencoder) answers this by acting as a transcoder with a discrete bottleneck. It takes activations from a lower layer, forces them through a finite codebook of vectors, and reconstructs the activations of a higher layer. Whatever survives the bottleneck, the codebook vectors that get used, are by construction the concepts essential to the cross-layer transformation. Duplicated residual-stream features collapse onto a single codebook entry instead of showing up over and over, and unlike SAEs, each input maps to one discrete concept vector rather than a linear combination of active neurons.\n\n\n\nOverview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.\n\n\nThe framework has three components, each with a design choice that turned out to matter.\n\n1. An adaptive residual encoder\nPre-trained LM embeddings are already information-rich; a randomly initialized encoder that fully transforms them destroys that structure before training can recover it. But a frozen identity map limits what can be discovered. We interpolate between the two with a learnable mixing coefficient:\n\\[\n\\mathbf{z}_e = (1 - \\alpha)\\,\\mathbf{x} + \\alpha \\cdot \\mathrm{LN}(W\\mathbf{x} + \\mathbf{b}), \\qquad \\alpha = \\sigma(a) \\cdot 0.5\n\\]\nCapping \\(\\alpha\\) at 0.5 prevents the encoder from drifting too far from the original embedding. In practice, \\(\\alpha\\) behaves like a built-in curriculum: it starts small (preserving the input) and grows as the encoder learns what is safe to change. Letting \\(\\alpha\\) range all the way to 1 measurably hurt codebook utilization.\n\n\n2. A vector quantizer with stochastic top-k sampling\nThe classic VQ-VAE failure mode is codebook collapse, where a few vectors get all the assignments and the rest die. Rather than deterministically snapping each encoder output to its nearest codebook vector, we sample from the \\(k=5\\) nearest entries with probabilities \\(\\propto \\exp(-d/\\tau)\\) at \\(\\tau = 1.0\\). This controlled exploration keeps more of the codebook alive and improves concept diversity. Codebook updates use exponential moving averages rather than backpropagation, which keeps training stable despite the discrete assignments.\nFor codebook initialization, we compare random sampling against two k-means variants: default (Euclidean) k-means, and a spherical variant that clusters unit-normalized embeddings by direction and then rescales each centroid by the average magnitude of its cluster. Which one is \"better\" turns out to be a genuinely interesting question, and there is more on that below.\n\n\n3. A transformer decoder\nA 6-layer transformer decoder maps the quantized concepts back to higher-layer activations. Because it reconstructs the whole sequence at once rather than generating autoregressively, self-attention is fully bidirectional, with no causal mask needed. Cross-attention to the unquantized encoder outputs acts as a residual path around the bottleneck, offloading low-level reconstruction details so the codebook can focus on distinct, high-level concepts. Our ablations confirm this: with cross-attention, codebook vectors are more orthogonal in 8 of 9 configurations and concepts are more faithful in 7 of 9."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#does-it-find-concepts-that-actually-matter",
+    "href": "posts/clvqvae/index.html#does-it-find-concepts-that-actually-matter",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Does it find concepts that actually matter?",
+    "text": "Does it find concepts that actually matter?\nWe evaluate across four models (fine-tuned RoBERTa and BERT, plus zero-shot LLaMA-2-7B and Qwen2.5-3B-Instruct) on three datasets (ERASER-Movie sentiment, Jigsaw toxicity, AG News), giving twelve model and dataset configurations. Baselines are latent-concept clustering, a single-layer VQ-VAE, and a cross-layer SAE.\nThe main quantitative test is a perturbation study: identify each sentence's most salient token via Layer Integrated Gradients, find the concept it maps to, remove that direction from the sentence representation via orthogonal projection, and measure how much a probe's accuracy drops. The bigger the drop, the more faithful the concept. Two controls guard against artifacts: removing a random direction barely moves accuracy, and removing a different active codebook vector causes far smaller drops in 8 of 9 tested configurations, so the damage is specific to the identified concept, not to perturbation in general.\nThe headline result: on RoBERTa/ERASER-Movie, removing the single concept CLVQ-VAE identifies sends probe accuracy from 0.878 down to 0.059, a 93.2% drop. Across all twelve configurations, CLVQ-VAE achieves the lowest perturbed accuracy in five, and a VQ-VAE method (cross-layer or single-layer) ranks first or second in all twelve, supporting the discrete-bottleneck paradigm itself.\nThe most striking comparative finding involves SAEs: they show near-zero or even negative drops on all six decoder-model settings, and CLVQ-VAE beats SAE in 10 of 12 configurations, by an average of 15.8 percentage points on the decoder models. We replicated the decoder failure with an independent SAE implementation (a Llama Scope-style TopK transcoder), suggesting this reflects a genuine limitation of sparse continuous representations for single-vector concept ablation, consistent with the feature-splitting hypothesis, and motivating the discrete bottleneck."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#are-the-concepts-real-concepts-or-just-compression",
+    "href": "posts/clvqvae/index.html#are-the-concepts-real-concepts-or-just-compression",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Are the concepts real concepts, or just compression?",
+    "text": "Are the concepts real concepts, or just compression?\nA skeptic might worry the codebook is merely compressing sentences rather than encoding distinct concepts. Three analyses say otherwise:\n\nVector level: label purity well above the random baseline (0.60 to 0.76 vs. 0.50 on binary tasks), with a visible spike of vectors firing exclusively on one class.\nToken level: 28 to 76% of content tokens route to different codebook vectors depending on context. My favorite example: in ERASER-Movie, the word entertainment routes to vector #137 (91% negative purity) in \"does not serve as... comic entertainment\" but to vector #73 (97% positive purity) in \"over-the-top entertainment.\" Same surface form, different concept, exactly what concept-level (rather than word-level) encoding should look like.\nSentence level: lexically similar sentences with the same label share 2.1 to 7.6x more codebook vectors than equally similar sentences with different labels, up to 30x at the strictest lexical-similarity threshold."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#do-judges-human-and-llm-agree",
+    "href": "posts/clvqvae/index.html#do-judges-human-and-llm-agree",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Do judges, human and LLM, agree?",
+    "text": "Do judges, human and LLM, agree?\nFaithfulness tells you a concept influences the model; it doesn't tell you the concept is understandable. So we evaluated interpretability two ways.\nLLM-as-a-judge. An ensemble of four LLM judges (GPT-4o-mini, Claude 3.5 Haiku, Gemini 2.0 Flash, Gemini 2.0 Flash Lite) rated how plausibly each method's concept explains the model's prediction, across stratified samples from all configurations. CLVQ-VAE ranks first with a 66.7% win rate, mean rating 1.890, and MRR 0.611, ahead of single-layer VQ-VAE, SAE, and clustering (44.4% win rate each).\nHuman evaluation. 14 annotators looked at word clouds of the tokens mapped to a sentence's most salient concept, without seeing the sentence, the model's prediction, or the label, and tried to predict what the model said.\n\n\n\nMetric\nClustering\nCLVQ-VAE\n\n\n\n\nFleiss' kappa (inter-annotator agreement)\n0.59\n0.864\n\n\nAvg. self-reported confidence (1 to 10)\n5.98\n8.44\n\n\nModel alignment rate\n54.1%\n78.2%\n\n\n\nAnnotators interpreting CLVQ-VAE visualizations agreed with each other at an \"almost perfect\" level, felt substantially more confident, and matched the model's actual prediction 24 points more often.\nMy favorite qualitative finding came from the failure cases. In one false negative, a positive review praised actors for a \"dead-on mockery\" and \"decent imitation\", and the salient concept lit up with lifted, fake, parody, imitation, ripped. The model had bound imitation-words to negative sentiment and couldn't distinguish criticism of unoriginality from praise of a good impersonation. That's exactly the kind of mechanistic insight into model errors that interpretability tools should surface.\n\n\n\nA false negative: the model misreads a positive review of a \"decent imitation\" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.\n\n\nThe method is just as legible when the model is right. For a correctly predicted negative review, the salient concept collects unambiguous markers of absence and negation (nothing, barely, none, whatsoever, hardly, neither), a coherent \"deficiency\" concept that maps cleanly onto the model's call.\n\n\n\nA true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#a-trade-off-worth-knowing-initialization-depends-on-your-goal",
+    "href": "posts/clvqvae/index.html#a-trade-off-worth-knowing-initialization-depends-on-your-goal",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "A trade-off worth knowing: initialization depends on your goal",
+    "text": "A trade-off worth knowing: initialization depends on your goal\nOne finding I find genuinely instructive: which codebook initialization is \"best\" depends on which evaluation you ask.\nUnder the faithfulness metric, default Euclidean k-means achieves the lowest perturbed accuracy in 7 of 12 configurations, often beating the spherical variant. But under the LLM-judge evaluation of semantic coherence, the ranking flips: spherical wins 62.5% of configurations with the highest mean rating and lowest variance, ahead of k-means (58.3%) and far ahead of random (25%), with strong inter-judge agreement (Kendall's W = 0.793).\nIn other words, k-means seems to find directions that are functionally important to the model's decisions, while clustering by direction (spherical) yields concepts that humans and LLMs find more coherent. Both k-means variants beat random initialization, which adds variance from its unstructured starting codebook. If you use CLVQ-VAE, pick the initialization to match your goal: functional faithfulness or semantic interpretability."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#try-it",
+    "href": "posts/clvqvae/index.html#try-it",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Try it",
+    "text": "Try it\nThe code, scripts, and prepared datasets are available on GitHub. The pipeline supports RoBERTa, BERT, LLaMA-2-7B, and Qwen2.5-3B-Instruct:\ngit clone https://github.com/agarg-dev/CLVQVAE.git\npip install torch transformers neurox scikit-learn numpy pandas matplotlib seaborn wordcloud\n\n# Train (configure dataset, layer pair, codebook size, initialization in scripts/main.sh)\nbash scripts/main.sh\n\n# Faithfulness evaluation\nbash scripts/faithfulness.sh\n\n# LLM-as-a-judge evaluation and inter-judge agreement\nbash scripts/llm_judge_evaluation.sh\nbash scripts/analyze_agreement.sh\nLayer pairs used in the paper: 8 to 12 for BERT/RoBERTa, 28 to 32 for LLaMA-2-7B, 32 to 36 for Qwen2.5-3B."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#limitations-and-whats-next",
+    "href": "posts/clvqvae/index.html#limitations-and-whats-next",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Limitations and what's next",
+    "text": "Limitations and what's next\nA few honest caveats. Extracting paired activations from multiple layers is memory-hungry, and k-means initialization adds cost that scales with dataset and codebook size, so models beyond ~70B parameters would need further optimization. The perturbation-based faithfulness metric differentiates methods well but is insensitive to hyperparameter changes like temperature, top-k, or codebook size, and the LLM-judge evaluation is sensitive to prompt construction. Finally, the framework trains a separate model per layer pair, and for decoder-only models we use mean-pooled embeddings in place of a CLS token, which may encode somewhat different information.\nLonger term, I'm excited about discrete cross-layer concepts as a building block: tracking how a concept vocabulary evolves across many layer pairs, applying the framework to instruction-tuned and reasoning models, and using discovered concepts for targeted interventions like steering and debiasing."
+  },
+  {
+    "objectID": "posts/clvqvae/index.html#citation",
+    "href": "posts/clvqvae/index.html#citation",
+    "title": "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers",
+    "section": "Citation",
+    "text": "Citation\n@article{garg2026clvqvae,\n  title   = {Cross-Layer Discrete Concept Discovery for Interpreting Language Models},\n  author  = {Garg, Ankur and Yu, Xuemin and Sajjad, Hassan and Ebrahimi Kahou, Samira},\n  journal = {arXiv preprint arXiv:2506.20040},\n  year    = {2026}\n}"
+  },
+  {
+    "objectID": "research.html",
+    "href": "research.html",
+    "title": "Research",
+    "section": "",
+    "text": "Under Review [PDF, Code, Blog post]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+  },
+  {
+    "objectID": "research.html#selected-publications",
+    "href": "research.html#selected-publications",
+    "title": "Research",
+    "section": "",
+    "text": "Under Review [PDF, Code, Blog post]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
+  },
+  {
+    "objectID": "research.html#all-publications",
+    "href": "research.html#all-publications",
+    "title": "Research",
+    "section": "All Publications",
+    "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Ankur Garg, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. (Under Review). 2025. arXiv:2506.20040.  [PDF, Code, Blog post]\nImproving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning  Abhishek Rajora, Ankur Garg, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.  AI in Medicine Symposium: BEYOND THE ALGORITHM and Annual Alberta Biomedical Engineering Conference, 2025.  Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to 87.07% (vs 83.21% baseline).\nHandwritten Text to Editable Text Document  Ankur Garg, Payal Deora, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
+  },
+  {
+    "objectID": "research.html#research-projects",
+    "href": "research.html#research-projects",
+    "title": "Research",
+    "section": "Research Projects",
+    "text": "Research Projects\n\nAutoCorrect for MultiLingual Text (2021)  Advisor: Prof. Saty Raghavachary (USC)\n\nObjective: Address spelling variation challenges in Transliterated Hindi-English code-mixed text.\nMethod: Engineered a novel two-stage model using a Conditional Random Field (CRF) for language identification and a BILSTM-BERT model for context-aware auto-correction.\nResult: Created a custom 6,000-word dataset and achieved a 69.3% F1 score.\n\nMulti-Media Morse Code Recognition (2020)\n\nObjective: Enable patient-caregiver communication via Morse code recognition across diverse sound mediums (e.g., finger taps, claps).\nMethod: Trained a CRNN-CTC model on 60 hours of audio data, enhanced with Gaussian noise for robustness.\nResult: Achieved a 98.37% F1 score on untrained mediums, significantly surpassing single-medium baselines (2%)."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ankur Garg",
+    "section": "",
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+  },
+  {
+    "objectID": "index.html#bio",
+    "href": "index.html#bio",
+    "title": "Ankur Garg",
+    "section": "",
+    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
+  },
+  {
+    "objectID": "index.html#news",
+    "href": "index.html#news",
+    "title": "Ankur Garg",
+    "section": "News",
+    "text": "News\n\nJun 2026: Wrote a blog post explaining our CLVQ-VAE interpretability framework.\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery”.\nOct 2025: Presented our work “Improving Pathology Foundation Models for Brain Tissue” at the AI in Medicine Symposium and the Alberta BME Conference.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
+  },
+  {
+    "objectID": "index.html#teaching-academic-service",
+    "href": "index.html#teaching-academic-service",
+    "title": "Ankur Garg",
+    "section": "Teaching & Academic Service",
+    "text": "Teaching & Academic Service\nI am an active reviewer for Transactions on Machine Learning Research (TMLR).\nI have served as a teaching assistant for the following courses:\n\nApplied Machine Learning and Predictive Analytics (ENEL 682), Winter 2025 & 2026, University of Calgary\nDatabase Systems (CSCI 585), Fall 2021, USC (Course Producer)"
+  },
+  {
+    "objectID": "index.html#scholarships-awards",
+    "href": "index.html#scholarships-awards",
+    "title": "Ankur Garg",
+    "section": "Scholarships & Awards",
+    "text": "Scholarships & Awards\n\nEyes High Doctoral Recruitment Scholarship (2025 – 2029)  A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential."
+  },
+  {
     "objectID": "cv.html",
     "href": "cv.html",
     "title": "Curriculum Vitae",
@@ -26,75 +173,5 @@
     "title": "Curriculum Vitae",
     "section": "Technical Skills",
     "text": "Technical Skills\n\nLanguages: Python, Java, C/C++, SQL, TypeScript\nMachine Learning: PyTorch, TensorFlow, Scikit-learn, HuggingFace Transformers, Pandas, NumPy\nWeb & Tools: Docker, Git, Angular, Node.js, Spring Boot, AWS, Jenkins"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Ankur Garg",
-    "section": "",
-    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
-  },
-  {
-    "objectID": "index.html#bio",
-    "href": "index.html#bio",
-    "title": "Ankur Garg",
-    "section": "",
-    "text": "I am a PhD student in the Department of Electrical and Software Engineering at the University of Calgary, advised by Prof. Samira Ebrahimi Kahou. I received my M.S. in Computer Science from the University of Southern California.\nMy research focuses on Machine Learning Interpretability and Large Language Models (LLMs). I am interested in deciphering the internal mechanisms of transformers to improve model transparency.\nPreviously, I was a Software Engineer at Salesforce and a Researcher at Harvard University."
-  },
-  {
-    "objectID": "index.html#news",
-    "href": "index.html#news",
-    "title": "Ankur Garg",
-    "section": "News",
-    "text": "News\n\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery”.\nOct 2025: Presented our work “Improving Pathology Foundation Models for Brain Tissue” at the AI in Medicine Symposium and the Alberta BME Conference.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
-  },
-  {
-    "objectID": "index.html#teaching-academic-service",
-    "href": "index.html#teaching-academic-service",
-    "title": "Ankur Garg",
-    "section": "Teaching & Academic Service",
-    "text": "Teaching & Academic Service\nI am an active reviewer for Transactions on Machine Learning Research (TMLR).\nI have served as a teaching assistant for the following courses:\n\nApplied Machine Learning and Predictive Analytics (ENEL 682), Winter 2025 & 2026, University of Calgary\nDatabase Systems (CSCI 585), Fall 2021, USC (Course Producer)"
-  },
-  {
-    "objectID": "index.html#scholarships-awards",
-    "href": "index.html#scholarships-awards",
-    "title": "Ankur Garg",
-    "section": "Scholarships & Awards",
-    "text": "Scholarships & Awards\n\nEyes High Doctoral Recruitment Scholarship (2025 – 2029)  A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential."
-  },
-  {
-    "objectID": "research.html",
-    "href": "research.html",
-    "title": "Research",
-    "section": "",
-    "text": "Under Review [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
-  },
-  {
-    "objectID": "research.html#selected-publications",
-    "href": "research.html#selected-publications",
-    "title": "Research",
-    "section": "",
-    "text": "Under Review [PDF, Code]\n\n\n\n\n\n\nWe introduce CLVQ-VAE, a framework to interpret Large Language Models by collapsing redundant residual features into discrete codebook vectors. Addressing the challenge of feature mixing in residual streams, our Adaptive Residual Encoder identifies interpretable concepts that achieve 78% model alignment in human evaluations and 93% faithfulness in ablation studies."
-  },
-  {
-    "objectID": "research.html#all-publications",
-    "href": "research.html#all-publications",
-    "title": "Research",
-    "section": "All Publications",
-    "text": "All Publications\n\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Anonymous Authors (Under Review). 2025. arXiv:2506.20040.  [PDF, Code]\nImproving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning  Abhishek Rajora, Ankur Garg, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.  AI in Medicine Symposium: BEYOND THE ALGORITHM and Annual Alberta Biomedical Engineering Conference, 2025.  Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to 87.07% (vs 83.21% baseline).\nHandwritten Text to Editable Text Document  Ankur Garg, Payal Deora, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  [Paper]  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
-  },
-  {
-    "objectID": "research.html#research-projects",
-    "href": "research.html#research-projects",
-    "title": "Research",
-    "section": "Research Projects",
-    "text": "Research Projects\n\nAutoCorrect for MultiLingual Text (2021)  Advisor: Prof. Saty Raghavachary (USC)\n\nObjective: Address spelling variation challenges in Transliterated Hindi-English code-mixed text.\nMethod: Engineered a novel two-stage model using a Conditional Random Field (CRF) for language identification and a BILSTM-BERT model for context-aware auto-correction.\nResult: Created a custom 6,000-word dataset and achieved a 69.3% F1 score.\n\nMulti-Media Morse Code Recognition (2020)\n\nObjective: Enable patient-caregiver communication via Morse code recognition across diverse sound mediums (e.g., finger taps, claps).\nMethod: Trained a CRNN-CTC model on 60 hours of audio data, enhanced with Gaussian noise for robustness.\nResult: Achieved a 98.37% F1 score on untrained mediums, significantly surpassing single-medium baselines (2%)."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site"
   }
 ]

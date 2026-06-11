@@ -4,12 +4,15 @@ project:
 
 website:
   title: "Ankur Garg"  # Your name in the top left
+  site-url: https://agarg-dev.github.io
   navbar:
     left:
       - href: index.qmd
         text: Home
       - href: research.qmd
         text: Research
+      - href: blog.qmd
+        text: Blog
       - href: cv.qmd
         text: CV
     right:

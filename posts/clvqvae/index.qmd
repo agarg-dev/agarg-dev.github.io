@@ -1,0 +1,148 @@
+---
+title: "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers"
+description: "How we use vector quantization to collapse the redundant, mixed-up features of the residual stream into a compact set of human-interpretable concepts."
+date: "2026-06-11"
+categories: [interpretability, LLMs, research]
+image: "../../images/clvq_vae.png"
+toc: true
+from: markdown-smart
+format:
+  html:
+    code-fold: false
+---
+
+::: {.callout-note appearance="simple"}
+This post accompanies our paper *Cross-Layer Discrete Concept Discovery for Interpreting Language Models* (with Xuemin Yu, Hassan Sajjad, and Samira Ebrahimi Kahou).
+[📄 Paper](https://arxiv.org/abs/2506.20040) · [💻 Code](https://github.com/agarg-dev/CLVQVAE)
+:::
+
+## Why is it so hard to see inside a transformer?
+
+Large language models work remarkably well, but *how* they work remains opaque. A natural first instinct is to pick a layer, look at its activations, and try to assign meaning to individual neurons or directions. Unfortunately, the transformer architecture itself fights you on this.
+
+The culprit is the **residual stream**. Every layer *adds* its contribution to a running representation, which means:
+
+1. **Features get duplicated.** A feature written at layer 3 is still visible at layers 8, 10, and 12, so a single-layer analysis sees the same concept many times over.
+2. **Features get mixed.** The stream linearly superimposes many features on top of each other, so any single snapshot is a tangled sum of everything written so far.
+
+Sparse autoencoders (SAEs) attack the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in *continuous* space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses *negation* or it doesn't. That mismatch limits interpretability.
+
+## Our idea: quantize the *transformation* between layers
+
+Instead of asking "what is encoded at layer $l$?", we ask:
+
+> **What concepts are needed to explain how the representation at layer $l$ becomes the representation at layer $h$?**
+
+**CLVQ-VAE** (Cross-Layer Vector Quantized Variational Autoencoder) answers this by acting as a *transcoder with a discrete bottleneck*. It takes activations from a lower layer, forces them through a finite codebook of vectors, and reconstructs the activations of a higher layer. Whatever survives the bottleneck, the codebook vectors that get used, are by construction the concepts essential to the cross-layer transformation. Duplicated residual-stream features collapse onto a single codebook entry instead of showing up over and over, and unlike SAEs, each input maps to *one* discrete concept vector rather than a linear combination of active neurons.
+
+![Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.](../../images/clvq_vae.png){width=85% fig-align="center"}
+
+The framework has three components, each with a design choice that turned out to matter.
+
+### 1. An adaptive residual encoder
+
+Pre-trained LM embeddings are already information-rich; a randomly initialized encoder that fully transforms them destroys that structure before training can recover it. But a frozen identity map limits what can be discovered. We interpolate between the two with a *learnable* mixing coefficient:
+
+$$
+\mathbf{z}_e = (1 - \alpha)\,\mathbf{x} + \alpha \cdot \mathrm{LN}(W\mathbf{x} + \mathbf{b}), \qquad \alpha = \sigma(a) \cdot 0.5
+$$
+
+Capping $\alpha$ at 0.5 prevents the encoder from drifting too far from the original embedding. In practice, $\alpha$ behaves like a built-in curriculum: it starts small (preserving the input) and grows as the encoder learns what is safe to change. Letting $\alpha$ range all the way to 1 measurably hurt codebook utilization.
+
+### 2. A vector quantizer with stochastic top-k sampling
+
+The classic VQ-VAE failure mode is **codebook collapse**, where a few vectors get all the assignments and the rest die. Rather than deterministically snapping each encoder output to its nearest codebook vector, we sample from the $k=5$ nearest entries with probabilities $\propto \exp(-d/\tau)$ at $\tau = 1.0$. This controlled exploration keeps more of the codebook alive and improves concept diversity. Codebook updates use exponential moving averages rather than backpropagation, which keeps training stable despite the discrete assignments.
+
+For codebook **initialization**, we compare random sampling against two k-means variants: default (Euclidean) k-means, and a spherical variant that clusters unit-normalized embeddings by direction and then rescales each centroid by the average magnitude of its cluster. Which one is "better" turns out to be a genuinely interesting question, and there is more on that below.
+
+### 3. A transformer decoder
+
+A 6-layer transformer decoder maps the quantized concepts back to higher-layer activations. Because it reconstructs the whole sequence at once rather than generating autoregressively, self-attention is fully bidirectional, with no causal mask needed. Cross-attention to the unquantized encoder outputs acts as a residual path around the bottleneck, offloading low-level reconstruction details so the codebook can focus on distinct, high-level concepts. Our ablations confirm this: with cross-attention, codebook vectors are more orthogonal in 8 of 9 configurations and concepts are more faithful in 7 of 9.
+
+## Does it find concepts that actually matter?
+
+We evaluate across four models (fine-tuned RoBERTa and BERT, plus zero-shot LLaMA-2-7B and Qwen2.5-3B-Instruct) on three datasets (ERASER-Movie sentiment, Jigsaw toxicity, AG News), giving twelve model and dataset configurations. Baselines are latent-concept clustering, a single-layer VQ-VAE, and a cross-layer SAE.
+
+The main quantitative test is a perturbation study: identify each sentence's most salient token via Layer Integrated Gradients, find the concept it maps to, remove that direction from the sentence representation via orthogonal projection, and measure how much a probe's accuracy drops. The bigger the drop, the more faithful the concept. Two controls guard against artifacts: removing a *random* direction barely moves accuracy, and removing a *different* active codebook vector causes far smaller drops in 8 of 9 tested configurations, so the damage is specific to the identified concept, not to perturbation in general.
+
+The headline result: on RoBERTa/ERASER-Movie, removing the single concept CLVQ-VAE identifies sends probe accuracy from 0.878 down to 0.059, a **93.2% drop**. Across all twelve configurations, CLVQ-VAE achieves the lowest perturbed accuracy in five, and a VQ-VAE method (cross-layer or single-layer) ranks first or second in *all twelve*, supporting the discrete-bottleneck paradigm itself.
+
+The most striking comparative finding involves SAEs: they show near-zero or even negative drops on **all six decoder-model settings**, and CLVQ-VAE beats SAE in 10 of 12 configurations, by an average of 15.8 percentage points on the decoder models. We replicated the decoder failure with an independent SAE implementation (a Llama Scope-style TopK transcoder), suggesting this reflects a genuine limitation of sparse continuous representations for single-vector concept ablation, consistent with the feature-splitting hypothesis, and motivating the discrete bottleneck.
+
+## Are the concepts real concepts, or just compression?
+
+A skeptic might worry the codebook is merely compressing sentences rather than encoding distinct concepts. Three analyses say otherwise:
+
+- **Vector level:** label purity well above the random baseline (0.60 to 0.76 vs. 0.50 on binary tasks), with a visible spike of vectors firing *exclusively* on one class.
+- **Token level:** 28 to 76% of content tokens route to *different* codebook vectors depending on context. My favorite example: in ERASER-Movie, the word *entertainment* routes to vector #137 (91% negative purity) in "does not serve as... comic entertainment" but to vector #73 (97% positive purity) in "over-the-top entertainment." Same surface form, different concept, exactly what concept-level (rather than word-level) encoding should look like.
+- **Sentence level:** lexically similar sentences with the *same* label share 2.1 to 7.6x more codebook vectors than equally similar sentences with *different* labels, up to 30x at the strictest lexical-similarity threshold.
+
+## Do judges, human and LLM, agree?
+
+Faithfulness tells you a concept influences the model; it doesn't tell you the concept is *understandable*. So we evaluated interpretability two ways.
+
+**LLM-as-a-judge.** An ensemble of four LLM judges (GPT-4o-mini, Claude 3.5 Haiku, Gemini 2.0 Flash, Gemini 2.0 Flash Lite) rated how plausibly each method's concept explains the model's prediction, across stratified samples from all configurations. CLVQ-VAE ranks first with a 66.7% win rate, mean rating 1.890, and MRR 0.611, ahead of single-layer VQ-VAE, SAE, and clustering (44.4% win rate each).
+
+**Human evaluation.** 14 annotators looked at word clouds of the tokens mapped to a sentence's most salient concept, without seeing the sentence, the model's prediction, or the label, and tried to predict what the model said.
+
+| Metric | Clustering | CLVQ-VAE |
+|---|---|---|
+| Fleiss' kappa (inter-annotator agreement) | 0.59 | **0.864** |
+| Avg. self-reported confidence (1 to 10) | 5.98 | **8.44** |
+| Model alignment rate | 54.1% | **78.2%** |
+
+Annotators interpreting CLVQ-VAE visualizations agreed with each other at an "almost perfect" level, felt substantially more confident, and matched the model's actual prediction 24 points more often.
+
+My favorite qualitative finding came from the *failure* cases. In one false negative, a positive review praised actors for a "dead-on mockery" and "decent imitation", and the salient concept lit up with *lifted, fake, parody, imitation, ripped*. The model had bound imitation-words to negative sentiment and couldn't distinguish criticism of unoriginality from praise of a good impersonation. That's exactly the kind of mechanistic insight into model errors that interpretability tools should surface.
+
+![A false negative: the model misreads a positive review of a "decent imitation" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.](../../images/FN.png){width=60% fig-align="center"}
+
+The method is just as legible when the model is *right*. For a correctly predicted negative review, the salient concept collects unambiguous markers of absence and negation (nothing, barely, none, whatsoever, hardly, neither), a coherent "deficiency" concept that maps cleanly onto the model's call.
+
+![A true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly.](../../images/TN.png){width=60% fig-align="center"}
+
+## A trade-off worth knowing: initialization depends on your goal
+
+One finding I find genuinely instructive: **which codebook initialization is "best" depends on which evaluation you ask.**
+
+Under the *faithfulness* metric, default Euclidean k-means achieves the lowest perturbed accuracy in 7 of 12 configurations, often beating the spherical variant. But under the *LLM-judge* evaluation of semantic coherence, the ranking flips: spherical wins 62.5% of configurations with the highest mean rating and lowest variance, ahead of k-means (58.3%) and far ahead of random (25%), with strong inter-judge agreement (Kendall's W = 0.793).
+
+In other words, k-means seems to find directions that are *functionally* important to the model's decisions, while clustering by direction (spherical) yields concepts that *humans and LLMs find more coherent*. Both k-means variants beat random initialization, which adds variance from its unstructured starting codebook. If you use CLVQ-VAE, pick the initialization to match your goal: functional faithfulness or semantic interpretability.
+
+## Try it
+
+The code, scripts, and prepared datasets are available on [GitHub](https://github.com/agarg-dev/CLVQVAE). The pipeline supports RoBERTa, BERT, LLaMA-2-7B, and Qwen2.5-3B-Instruct:
+
+```bash
+git clone https://github.com/agarg-dev/CLVQVAE.git
+pip install torch transformers neurox scikit-learn numpy pandas matplotlib seaborn wordcloud
+
+# Train (configure dataset, layer pair, codebook size, initialization in scripts/main.sh)
+bash scripts/main.sh
+
+# Faithfulness evaluation
+bash scripts/faithfulness.sh
+
+# LLM-as-a-judge evaluation and inter-judge agreement
+bash scripts/llm_judge_evaluation.sh
+bash scripts/analyze_agreement.sh
+```
+
+Layer pairs used in the paper: 8 to 12 for BERT/RoBERTa, 28 to 32 for LLaMA-2-7B, 32 to 36 for Qwen2.5-3B.
+
+## Limitations and what's next
+
+A few honest caveats. Extracting paired activations from multiple layers is memory-hungry, and k-means initialization adds cost that scales with dataset and codebook size, so models beyond ~70B parameters would need further optimization. The perturbation-based faithfulness metric differentiates methods well but is insensitive to hyperparameter changes like temperature, top-k, or codebook size, and the LLM-judge evaluation is sensitive to prompt construction. Finally, the framework trains a separate model per layer pair, and for decoder-only models we use mean-pooled embeddings in place of a CLS token, which may encode somewhat different information.
+
+Longer term, I'm excited about discrete cross-layer concepts as a building block: tracking how a concept vocabulary evolves across *many* layer pairs, applying the framework to instruction-tuned and reasoning models, and using discovered concepts for targeted interventions like steering and debiasing.
+
+## Citation
+
+```bibtex
+@article{garg2026clvqvae,
+  title   = {Cross-Layer Discrete Concept Discovery for Interpreting Language Models},
+  author  = {Garg, Ankur and Yu, Xuemin and Sajjad, Hassan and Ebrahimi Kahou, Samira},
+  journal = {arXiv preprint arXiv:2506.20040},
+  year    = {2026}
+}
+```

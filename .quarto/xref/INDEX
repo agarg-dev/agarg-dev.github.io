@@ -1,17 +1,20 @@
 {
-  "projects.qmd": {
-    "projects.html": "256911eb"
+  "posts/clvqvae/index.qmd": {
+    "index.html": "496ee40a"
   },
-  "index.qmd": {
-    "index.html": "e550c603"
-  },
-  "about.qmd": {
-    "about.html": "e332557a"
-  },
-  "cv.qmd": {
-    "cv.html": "67a56433"
+  "blog.qmd": {
+    "blog.html": "39501773"
   },
   "research.qmd": {
-    "research.html": "37f5f2fe"
+    "research.html": "d01aa453"
+  },
+  "index.qmd": {
+    "index.html": "87d9d7b0"
+  },
+  "about.qmd": {
+    "about.html": "c9035bdd"
+  },
+  "cv.qmd": {
+    "cv.html": "fe713fd3"
   }
 }

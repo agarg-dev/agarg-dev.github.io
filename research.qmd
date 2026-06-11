@@ -6,7 +6,7 @@ title: "Research"
 
 ::: {.selected-pub}
 ### **Cross-Layer Discrete Concept Discovery (CLVQ-VAE)**
-*Under Review* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
+*Under Review* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/CLVQVAE), [Blog post](blog.html)]
 
 :::: {layout="[45, 55]"}
 
@@ -26,8 +26,8 @@ We introduce **CLVQ-VAE**, a framework to interpret Large Language Models by col
 ## All Publications
 
 * **Cross-Layer Discrete Concept Discovery for Interpreting Language Models**
-  <br> *Anonymous Authors (Under Review)*. 2025. arXiv:2506.20040.
-  <br> [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/)]
+  <br> **Ankur Garg**, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. *(Under Review)*. 2025. arXiv:2506.20040.
+  <br> [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/CLVQVAE), [Blog post](blog.html)]
 
 * **Improving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning**
   <br> Abhishek Rajora, **Ankur Garg**, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.
