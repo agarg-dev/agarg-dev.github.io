@@ -3,7 +3,7 @@ title: "CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers"
 description: "How we use vector quantization to collapse the redundant, mixed-up features of the residual stream into a compact set of human-interpretable concepts."
 date: "2026-06-11"
 categories: [interpretability, LLMs, research]
-image: "../../images/clvq_vae.png"
+image: "images/clvq_vae.png"
 toc: true
 from: markdown-smart
 format:
@@ -35,7 +35,7 @@ Instead of asking "what is encoded at layer $l$?", we ask:
 
 **CLVQ-VAE** (Cross-Layer Vector Quantized Variational Autoencoder) answers this by acting as a *transcoder with a discrete bottleneck*. It takes activations from a lower layer, forces them through a finite codebook of vectors, and reconstructs the activations of a higher layer. Whatever survives the bottleneck, the codebook vectors that get used, are by construction the concepts essential to the cross-layer transformation. Duplicated residual-stream features collapse onto a single codebook entry instead of showing up over and over, and unlike SAEs, each input maps to *one* discrete concept vector rather than a linear combination of active neurons.
 
-![Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.](../../images/clvq_vae.png){width=85% fig-align="center"}
+![Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.](images/clvq_vae.png){width=85% fig-align="center"}
 
 The framework has three crucial components.
 
@@ -95,11 +95,11 @@ Annotators interpreting CLVQ-VAE visualizations agreed with each other at an "al
 
 My favorite qualitative finding came from the *failure* cases. In one false negative, a positive review praised actors for a "dead-on mockery" and "decent imitation", and the salient concept lit up with *lifted, fake, parody, imitation, ripped*. The model had bound imitation-words to negative sentiment and couldn't distinguish criticism of unoriginality from praise of a good impersonation. That's exactly the kind of mechanistic insight into model errors that interpretability tools should surface.
 
-![A false negative: the model misreads a positive review of a "decent imitation" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.](../../images/FN.png){width=60% fig-align="center"}
+![A false negative: the model misreads a positive review of a "decent imitation" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.](images/FN.png){width=60% fig-align="center"}
 
 The method is just as legible when the model is *right*. For a correctly predicted negative review, the salient concept collects unambiguous markers of absence and negation (nothing, barely, none, whatsoever, hardly, neither), a coherent "deficiency" concept that maps cleanly onto the model's call.
 
-![A true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly.](../../images/TN.png){width=60% fig-align="center"}
+![A true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly.](images/TN.png){width=60% fig-align="center"}
 
 ## A trade-off worth knowing: initialization depends on your goal
 

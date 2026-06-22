@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-06-11">
-<meta name="description" content="How we use vector quantization to collapse the redundant, mixed-up features of the residual stream into a compact set of human-interpretable concepts.">
+<meta name="dcterms.date" content="2026-06-22">
+<meta name="description" content="A classifier that fixes its own blind spots by turning training difficulty into its architecture, so the subgroup structure it learns is visible at inference instead of buried in the weights.">
 
-<title>CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers – Ankur Garg</title>
+<title>Neural Classification Trees: Discovering Latent Groups for Robust Classification – Ankur Garg</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -372,19 +372,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-is-it-so-hard-to-look-inside-a-transformer" id="toc-why-is-it-so-hard-to-look-inside-a-transformer" class="nav-link active" data-scroll-target="#why-is-it-so-hard-to-look-inside-a-transformer">Why is it so hard to look inside a transformer?</a></li>
-  <li><a href="#our-idea-quantize-the-transformation-between-layers" id="toc-our-idea-quantize-the-transformation-between-layers" class="nav-link" data-scroll-target="#our-idea-quantize-the-transformation-between-layers">Our idea: quantize the <em>transformation</em> between layers</a>
-  <ul class="collapse">
-  <li><a href="#an-adaptive-residual-encoder" id="toc-an-adaptive-residual-encoder" class="nav-link" data-scroll-target="#an-adaptive-residual-encoder">1. An adaptive residual encoder</a></li>
-  <li><a href="#a-vector-quantizer-with-stochastic-top-k-sampling" id="toc-a-vector-quantizer-with-stochastic-top-k-sampling" class="nav-link" data-scroll-target="#a-vector-quantizer-with-stochastic-top-k-sampling">2. A vector quantizer with stochastic top-k sampling</a></li>
-  <li><a href="#a-transformer-decoder" id="toc-a-transformer-decoder" class="nav-link" data-scroll-target="#a-transformer-decoder">3. A transformer decoder</a></li>
-  </ul></li>
-  <li><a href="#does-it-find-concepts-that-actually-matter" id="toc-does-it-find-concepts-that-actually-matter" class="nav-link" data-scroll-target="#does-it-find-concepts-that-actually-matter">Does it find concepts that actually matter?</a></li>
-  <li><a href="#are-the-concepts-real-concepts-or-just-compression" id="toc-are-the-concepts-real-concepts-or-just-compression" class="nav-link" data-scroll-target="#are-the-concepts-real-concepts-or-just-compression">Are the concepts real concepts, or just compression?</a></li>
-  <li><a href="#do-judges-human-and-llm-agree" id="toc-do-judges-human-and-llm-agree" class="nav-link" data-scroll-target="#do-judges-human-and-llm-agree">Do judges, human and LLM, agree?</a></li>
-  <li><a href="#a-trade-off-worth-knowing-initialization-depends-on-your-goal" id="toc-a-trade-off-worth-knowing-initialization-depends-on-your-goal" class="nav-link" data-scroll-target="#a-trade-off-worth-knowing-initialization-depends-on-your-goal">A trade-off worth knowing: initialization depends on your goal</a></li>
+  <li><a href="#the-shortcut-problem-and-the-part-nobody-shows-you" id="toc-the-shortcut-problem-and-the-part-nobody-shows-you" class="nav-link active" data-scroll-target="#the-shortcut-problem-and-the-part-nobody-shows-you">The shortcut problem, and the part nobody shows you</a></li>
+  <li><a href="#the-idea-make-the-partition-the-architecture" id="toc-the-idea-make-the-partition-the-architecture" class="nav-link" data-scroll-target="#the-idea-make-the-partition-the-architecture">The idea: make the partition the architecture</a></li>
+  <li><a href="#how-the-tree-grows" id="toc-how-the-tree-grows" class="nav-link" data-scroll-target="#how-the-tree-grows">How the tree grows</a></li>
+  <li><a href="#why-difficulty-is-a-good-compass" id="toc-why-difficulty-is-a-good-compass" class="nav-link" data-scroll-target="#why-difficulty-is-a-good-compass">Why difficulty is a good compass</a></li>
+  <li><a href="#does-it-actually-work" id="toc-does-it-actually-work" class="nav-link" data-scroll-target="#does-it-actually-work">Does it actually work?</a></li>
+  <li><a href="#what-the-tree-actually-learns" id="toc-what-the-tree-actually-learns" class="nav-link" data-scroll-target="#what-the-tree-actually-learns">What the tree actually learns</a></li>
+  <li><a href="#going-one-level-deeper" id="toc-going-one-level-deeper" class="nav-link" data-scroll-target="#going-one-level-deeper">Going one level deeper</a></li>
+  <li><a href="#limitations-and-what-is-next" id="toc-limitations-and-what-is-next" class="nav-link" data-scroll-target="#limitations-and-what-is-next">Limitations and what is next</a></li>
   <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it">Try it</a></li>
-  <li><a href="#limitations-and-whats-next" id="toc-limitations-and-whats-next" class="nav-link" data-scroll-target="#limitations-and-whats-next">Limitations and what's next</a></li>
   <li><a href="#citation" id="toc-citation" class="nav-link" data-scroll-target="#citation">Citation</a></li>
   </ul>
 </nav>
@@ -395,17 +391,18 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers</h1>
+<h1 class="title">Neural Classification Trees: Discovering Latent Groups for Robust Classification</h1>
   <div class="quarto-categories">
+    <div class="quarto-category">robustness</div>
     <div class="quarto-category">interpretability</div>
-    <div class="quarto-category">LLMs</div>
+    <div class="quarto-category">spurious correlations</div>
     <div class="quarto-category">research</div>
   </div>
   </div>
 
 <div>
   <div class="description">
-    How we use vector quantization to collapse the redundant, mixed-up features of the residual stream into a compact set of human-interpretable concepts.
+    A classifier that fixes its own blind spots by turning training difficulty into its architecture, so the subgroup structure it learns is visible at inference instead of buried in the weights.
   </div>
 </div>
 
@@ -416,7 +413,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 11, 2026</p>
+      <p class="date">June 22, 2026</p>
     </div>
   </div>
   
@@ -428,155 +425,113 @@ window.Quarto = {
 </header>
 
 
+<!-- TODO: replace the placeholder "#" Paper link below with the arXiv abstract URL once it is live -->
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>This post accompanies our paper <em>Cross-Layer Discrete Concept Discovery for Interpreting Language Models</em> (with Xuemin Yu, Hassan Sajjad, and Samira Ebrahimi Kahou). <a href="https://arxiv.org/abs/2506.20040">📄 Paper</a> · <a href="https://github.com/agarg-dev/CLVQVAE">💻 Code</a></p>
+<p>This post accompanies our paper <em>Discovering Latent Groups for Robust Classification</em> (with Ulrich Aïvodji, Samira Ebrahimi Kahou, and Vincent Michalski). <a href="#">📄 Paper (arXiv coming soon)</a> · <a href="https://github.com/agarg-dev/Neural-Classification-Trees">💻 Code</a></p>
 </div>
 </div>
 </div>
-<section id="why-is-it-so-hard-to-look-inside-a-transformer" class="level2">
-<h2 class="anchored" data-anchor-id="why-is-it-so-hard-to-look-inside-a-transformer">Why is it so hard to look inside a transformer?</h2>
-<p>Large language models work remarkably well, but <em>how</em> they work remains opaque. A natural first instinct is to pick a layer, look at its activations, and try to assign meaning to individual neurons or directions. Unfortunately, the transformer architecture itself fights you on this.</p>
-<p>The culprit is the <strong>residual stream</strong>. Every layer <em>adds</em> its contribution to a running representation, which means:</p>
+<section id="the-shortcut-problem-and-the-part-nobody-shows-you" class="level2">
+<h2 class="anchored" data-anchor-id="the-shortcut-problem-and-the-part-nobody-shows-you">The shortcut problem, and the part nobody shows you</h2>
+<p>Deep networks love a shortcut. Train an image classifier to tell waterbirds from landbirds and, if almost every waterbird in your data sits on water, the model will quietly learn to read the <em>background</em> instead of the bird. Average accuracy looks great. Then a waterbird shows up in front of a forest and the model confidently calls it a landbird. This is the classic story of <em>spurious correlations</em>, and the failures land hardest on the underrepresented subgroups: the waterbird on land, the blond man, the lesion without the tell-tale marker.</p>
+<p>The research community has built effective tools to mitigate this. Group DRO upweights the worst group, JTT retrains on the errors of an early-stopped model, GEORGE clusters features into pseudo-subgroups, and so on. They work. But they share a blind spot of their own: after all that effort, the final classifier is still opaque about the groups it learned. Ask it which latent subgroup a particular image belongs to, and it has nothing to say. The robustness lives in the parameters; the <em>structure</em> stays invisible.</p>
+<p>That is the gap we set out to close.</p>
+</section>
+<section id="the-idea-make-the-partition-the-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-make-the-partition-the-architecture">The idea: make the partition the architecture</h2>
+<p>Most methods treat training difficulty as a <em>transient</em> signal: find the hard samples, upweight them, then throw the partition away. Our bet is that the partition is the interesting part, and it should survive.</p>
+<p><strong>Neural Classification Trees (NCT)</strong> turn difficulty into a tree-shaped architecture. The construction is simple and self-supervised:</p>
 <ol type="1">
-<li><strong>Features get duplicated.</strong> A feature written at layer 3 is still visible at layers 8, 10, and 12, so a single-layer analysis sees the same concept many times over.</li>
-<li><strong>Features get mixed.</strong> The stream linearly superimposes many features on top of each other, so any single snapshot is a tangled sum of everything written so far.</li>
+<li>Train the model for a short burst. Some samples get classified correctly (the <em>easy</em> ones), some do not (the <em>hard</em> ones).</li>
+<li>Split each node into two children accordingly: an easy branch for the samples it got right, a hard branch for the ones it got wrong.</li>
+<li>Reuse those routes as the labels for the next iteration, and repeat.</li>
 </ol>
-<p>Sparse autoencoders (SAEs) address the mixing problem, and recent cross-layer variants attack the duplication too. But SAEs operate in <em>continuous</em> space, where concepts split across many neurons without clear boundaries, and isolating one requires arbitrary activation thresholds or combinations of multiple feature directions. Humans, meanwhile, reason in discrete categories: a token either expresses <em>negation</em> or it doesn't. This mismatch limits interpretability.</p>
-</section>
-<section id="our-idea-quantize-the-transformation-between-layers" class="level2">
-<h2 class="anchored" data-anchor-id="our-idea-quantize-the-transformation-between-layers">Our idea: quantize the <em>transformation</em> between layers</h2>
-<p>Instead of asking "what is encoded at layer <span class="math inline">\(l\)</span>?", we ask:</p>
-<blockquote class="blockquote">
-<p><strong>What concepts are needed to explain how the representation at layer <span class="math inline">\(l\)</span> becomes the representation at layer <span class="math inline">\(h\)</span>?</strong></p>
-</blockquote>
-<p><strong>CLVQ-VAE</strong> (Cross-Layer Vector Quantized Variational Autoencoder) answers this by acting as a <em>transcoder with a discrete bottleneck</em>. It takes activations from a lower layer, forces them through a finite codebook of vectors, and reconstructs the activations of a higher layer. Whatever survives the bottleneck, the codebook vectors that get used, are by construction the concepts essential to the cross-layer transformation. Duplicated residual-stream features collapse onto a single codebook entry instead of showing up over and over, and unlike SAEs, each input maps to <em>one</em> discrete concept vector rather than a linear combination of active neurons.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/clvq_vae.png" class="img-fluid figure-img" style="width:85.0%"></p>
-<figcaption>Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.</figcaption>
-</figure>
-</div>
-<p>The framework has three crucial components.</p>
-<section id="an-adaptive-residual-encoder" class="level3">
-<h3 class="anchored" data-anchor-id="an-adaptive-residual-encoder">1. An adaptive residual encoder</h3>
-<p>Pre-trained LM embeddings are already information-rich; a randomly initialized encoder that fully transforms them destroys that structure before training can recover it. But a frozen identity map limits what can be discovered. We interpolate between the two with a <em>learnable</em> mixing coefficient:</p>
+<p>No subgroup annotations are ever required. The signal driving the whole tree is just correctness. Concretely, with a binary difficulty indicator <span class="math inline">\(d^{(t)}_i\)</span> that is 1 when sample <span class="math inline">\(i\)</span> is misclassified at iteration <span class="math inline">\(t\)</span>, the node assignment updates as</p>
 <p><span class="math display">\[
-\mathbf{z}_e = (1 - \alpha)\,\mathbf{x} + \alpha \cdot \mathrm{LN}(W\mathbf{x} + \mathbf{b}), \qquad \alpha = \sigma(a) \cdot 0.5
+\ell^{(t+1)}_i = 2\,\ell^{(t)}_i + d^{(t)}_i,
 \]</span></p>
-<p>Capping <span class="math inline">\(\alpha\)</span> at 0.5 prevents the encoder from drifting too far from the original embedding. In practice, <span class="math inline">\(\alpha\)</span> behaves like a built-in curriculum: it starts small (preserving the input) and grows as the encoder learns what is safe to change. Letting <span class="math inline">\(\alpha\)</span> range all the way to 1 measurably hurt codebook utilization.</p>
-</section>
-<section id="a-vector-quantizer-with-stochastic-top-k-sampling" class="level3">
-<h3 class="anchored" data-anchor-id="a-vector-quantizer-with-stochastic-top-k-sampling">2. A vector quantizer with stochastic top-k sampling</h3>
-<p>The classic VQ-VAE failure mode is <strong>codebook collapse</strong>, where a few vectors get all the assignments and the rest die. Rather than deterministically snapping each encoder output to its nearest codebook vector, we sample from the <span class="math inline">\(k=5\)</span> nearest entries with probabilities <span class="math inline">\(\propto \exp(-d/\tau)\)</span> at <span class="math inline">\(\tau = 1.0\)</span>. This controlled exploration keeps more of the codebook alive and improves concept diversity. Codebook updates use exponential moving averages rather than backpropagation, which keeps training stable despite the discrete assignments.</p>
-<p>For codebook <strong>initialization</strong>, we compare random sampling against two k-means variants: default (Euclidean) k-means, and a spherical variant that clusters unit-normalized embeddings by direction and then rescales each centroid by the average magnitude of its cluster. Which one is "better" turns out to be a genuinely interesting question, and there is more on that below.</p>
-</section>
-<section id="a-transformer-decoder" class="level3">
-<h3 class="anchored" data-anchor-id="a-transformer-decoder">3. A transformer decoder</h3>
-<p>A 6-layer transformer decoder maps the quantized concepts back to higher-layer activations. Because it reconstructs the whole sequence at once rather than generating autoregressively, self-attention is fully bidirectional, with no causal mask needed. Cross-attention to the unquantized encoder outputs acts as a residual path around the bottleneck, offloading low-level reconstruction details so the codebook can focus on distinct, high-level concepts. Our ablations confirm this: with cross-attention, codebook vectors are more orthogonal in 8 of 9 configurations and concepts are more faithful in 7 of 9.</p>
-</section>
-</section>
-<section id="does-it-find-concepts-that-actually-matter" class="level2">
-<h2 class="anchored" data-anchor-id="does-it-find-concepts-that-actually-matter">Does it find concepts that actually matter?</h2>
-<p>We evaluate across four models (fine-tuned RoBERTa and BERT, plus zero-shot LLaMA-2-7B and Qwen2.5-3B-Instruct) on three datasets (ERASER-Movie sentiment, Jigsaw toxicity, AG News), giving twelve model and dataset configurations. Baselines are latent-concept clustering, a single-layer VQ-VAE, and a cross-layer SAE.</p>
-<p>The main quantitative test is a perturbation study: identify each sentence's most salient token via Layer Integrated Gradients, find the concept it maps to, remove that direction from the sentence representation via orthogonal projection, and measure how much a probe's accuracy drops. The bigger the drop, the more faithful the concept. Two controls guard against artifacts: removing a <em>random</em> direction barely moves accuracy, and removing a <em>different</em> active codebook vector causes far smaller drops in 8 of 9 tested configurations, so the damage is specific to the identified concept, not to perturbation in general.</p>
-<p>The headline result: on RoBERTa/ERASER-Movie, removing the single concept CLVQ-VAE identifies sends probe accuracy from 0.878 down to 0.059, a <strong>93.2% drop</strong>. Across all twelve configurations, CLVQ-VAE achieves the lowest perturbed accuracy in five, and a VQ-VAE method (cross-layer or single-layer) ranks first or second in <em>all twelve</em>, supporting the discrete-bottleneck paradigm itself.</p>
-<p>The most striking comparative finding involves SAEs: they show near-zero or even negative drops on <strong>all six decoder-model settings</strong>, and CLVQ-VAE beats SAE in 10 of 12 configurations, by an average of 15.8 percentage points on the decoder models. We replicated the decoder failure with an independent SAE implementation (a Llama Scope-style TopK transcoder), suggesting this reflects a genuine limitation of sparse continuous representations for single-vector concept ablation, consistent with the feature-splitting hypothesis, and motivating the discrete bottleneck.</p>
-</section>
-<section id="are-the-concepts-real-concepts-or-just-compression" class="level2">
-<h2 class="anchored" data-anchor-id="are-the-concepts-real-concepts-or-just-compression">Are the concepts real concepts, or just compression?</h2>
-<p>A skeptic might worry the codebook is merely compressing sentences rather than encoding distinct concepts. Three analyses say otherwise:</p>
-<ul>
-<li><strong>Vector level:</strong> label purity well above the random baseline (0.60 to 0.76 vs. 0.50 on binary tasks), with a visible spike of vectors firing <em>exclusively</em> on one class.</li>
-<li><strong>Token level:</strong> 28 to 76% of content tokens route to <em>different</em> codebook vectors depending on context. My favorite example: in ERASER-Movie, the word <em>entertainment</em> routes to vector #137 (91% negative purity) in "does not serve as... comic entertainment" but to vector #73 (97% positive purity) in "over-the-top entertainment." Same surface form, different concept, exactly what concept-level (rather than word-level) encoding should look like.</li>
-<li><strong>Sentence level:</strong> lexically similar sentences with the <em>same</em> label share 2.1 to 7.6x more codebook vectors than equally similar sentences with <em>different</em> labels, up to 30x at the strictest lexical-similarity threshold.</li>
-</ul>
-</section>
-<section id="do-judges-human-and-llm-agree" class="level2">
-<h2 class="anchored" data-anchor-id="do-judges-human-and-llm-agree">Do judges, human and LLM, agree?</h2>
-<p>Faithfulness tells you a concept influences the model; it doesn't tell you the concept is <em>understandable</em>. So we evaluated interpretability two ways.</p>
-<p><strong>LLM-as-a-judge.</strong> An ensemble of four LLM judges (GPT-4o-mini, Claude 3.5 Haiku, Gemini 2.0 Flash, Gemini 2.0 Flash Lite) rated how plausibly each method's concept explains the model's prediction, across stratified samples from all configurations. CLVQ-VAE ranks first with a 66.7% win rate, mean rating 1.890, and MRR 0.611, ahead of single-layer VQ-VAE, SAE, and clustering (44.4% win rate each).</p>
-<p><strong>Human evaluation.</strong> 14 annotators looked at word clouds of the tokens mapped to a sentence's most salient concept, without seeing the sentence, the model's prediction, or the label, and tried to predict what the model said.</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Metric</th>
-<th>Clustering</th>
-<th>CLVQ-VAE</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Fleiss' kappa (inter-annotator agreement)</td>
-<td>0.59</td>
-<td><strong>0.864</strong></td>
-</tr>
-<tr class="even">
-<td>Avg. self-reported confidence (1 to 10)</td>
-<td>5.98</td>
-<td><strong>8.44</strong></td>
-</tr>
-<tr class="odd">
-<td>Model alignment rate</td>
-<td>54.1%</td>
-<td><strong>78.2%</strong></td>
-</tr>
-</tbody>
-</table>
-<p>Annotators interpreting CLVQ-VAE visualizations agreed with each other at an "almost perfect" level, felt substantially more confident, and matched the model's actual prediction 24 points more often.</p>
-<p>My favorite qualitative finding came from the <em>failure</em> cases. In one false negative, a positive review praised actors for a "dead-on mockery" and "decent imitation", and the salient concept lit up with <em>lifted, fake, parody, imitation, ripped</em>. The model had bound imitation-words to negative sentiment and couldn't distinguish criticism of unoriginality from praise of a good impersonation. That's exactly the kind of mechanistic insight into model errors that interpretability tools should surface.</p>
+<p>so every parent node <span class="math inline">\(j\)</span> splits into an easy child <span class="math inline">\(2j\)</span> and a hard child <span class="math inline">\(2j+1\)</span>. After <span class="math inline">\(T\)</span> iterations, the binary string of easy/hard decisions along the route to a leaf is a compact record of how difficult that sample was to learn. Crucially, this tree is not scaffolding that gets discarded: it <em>is</em> the inference-time model. Each leaf reports both a predicted class and the difficulty path that produced it.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/FN.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<figcaption>A false negative: the model misreads a positive review of a "decent imitation" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.</figcaption>
-</figure>
-</div>
-<p>The method is just as legible when the model is <em>right</em>. For a correctly predicted negative review, the salient concept collects unambiguous markers of absence and negation (nothing, barely, none, whatsoever, hardly, neither), a coherent "deficiency" concept that maps cleanly onto the model's call.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/TN.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<figcaption>A true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly.</figcaption>
+<p><img src="images/nct_architecture.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<figcaption>NCT inference. Backbone features flow through parent-to-child heads across iterations; an argmax over all leaf outputs yields the group label, which encodes both the class and the easy/hard path.</figcaption>
 </figure>
 </div>
 </section>
-<section id="a-trade-off-worth-knowing-initialization-depends-on-your-goal" class="level2">
-<h2 class="anchored" data-anchor-id="a-trade-off-worth-knowing-initialization-depends-on-your-goal">A trade-off worth knowing: initialization depends on your goal</h2>
-<p>One finding I find genuinely instructive: <strong>which codebook initialization is "best" depends on which evaluation you ask.</strong></p>
-<p>Under the <em>faithfulness</em> metric, default Euclidean k-means achieves the lowest perturbed accuracy in 7 of 12 configurations, often beating the spherical variant. But under the <em>LLM-judge</em> evaluation of semantic coherence, the ranking flips: spherical wins 62.5% of configurations with the highest mean rating and lowest variance, ahead of k-means (58.3%) and far ahead of random (25%), with strong inter-judge agreement (Kendall's W = 0.793).</p>
-<p>In other words, k-means seems to find directions that are <em>functionally</em> important to the model's decisions, while clustering by direction (spherical) yields concepts that <em>humans and LLMs find more coherent</em>. Both k-means variants beat random initialization, which adds variance from its unstructured starting codebook. If you use CLVQ-VAE, pick the initialization to match your goal: functional faithfulness or semantic interpretability.</p>
+<section id="how-the-tree-grows" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-tree-grows">How the tree grows</h2>
+<p>A few design choices turned out to matter more than we expected.</p>
+<p><strong>Routing by correctness.</strong> The split is deterministic and driven entirely by training dynamics: correctly classified samples flow to the easy child, misclassified ones to the hard child. There is no clustering step and no threshold to tune.</p>
+<p><strong>Asymmetric head capacity.</strong> The two children of a split are not built the same way. Easy children, which inherit samples the parent already handles, are a single linear layer. Hard children, which absorb the conflicting cases, get a richer Linear-ReLU-Dropout block. The extra capacity belongs where the difficult features live, and our ablations confirm that putting it on the easy branch instead consistently underperforms.</p>
+<p><strong>Hierarchical feature flow.</strong> Deeper heads do not see raw backbone features; they receive their parent's representation. Specialization therefore compounds down the tree rather than starting over at every level.</p>
+<p><strong>Stability.</strong> Training a hierarchy iteratively risks catastrophic forgetting, where adapting the children destabilizes the parents they depend on. We counter this with an auxiliary loss that keeps the parent representations valid, plus a two-phase schedule: first adapt the new heads with the backbone frozen, then fine-tune the whole network so it can resolve cases that were previously inseparable.</p>
+<p><strong>Knowing when to stop.</strong> A correctness-based tree grows multiplicatively, but not every dataset wants a deep one. NCT decides its own depth without group labels using a pseudo worst-group accuracy criterion with a Wilson-tolerance stopping bound, and folds away hard children that end up with too few samples to be worth a head.</p>
+</section>
+<section id="why-difficulty-is-a-good-compass" class="level2">
+<h2 class="anchored" data-anchor-id="why-difficulty-is-a-good-compass">Why difficulty is a good compass</h2>
+<p>Two pieces of theory motivate the design.</p>
+<p><strong>Misclassified samples are enriched with minorities.</strong> Neural networks tend to learn the simple, prominent feature first (this is the well-documented <em>simplicity bias</em>). When a spurious correlation is strong, that easy feature is the spurious one, so after the first short training burst the model is mostly predicting the spurious attribute rather than the true label. The samples it gets <em>wrong</em> are therefore disproportionately the minority cases where the attribute and label disagree, and the stronger the spurious correlation, the more lopsided that error set becomes. Routing those errors into the hard branch is what concentrates the minority subgroup there.</p>
+<p><strong>One classifier cannot serve two conflicting subgroups.</strong> When the easy and hard subgroups need genuinely different features (the majority is best classified by the background, the minority only by the bird), no single linear classifier is optimal on both at once. We make this precise as an approximation gap: any shared classifier pays a worst-group penalty that a pair of specialists avoids, and that penalty widens as the spurious correlation gets stronger. NCT's separate heads are exactly the specialists that close it.</p>
+</section>
+<section id="does-it-actually-work" class="level2">
+<h2 class="anchored" data-anchor-id="does-it-actually-work">Does it actually work?</h2>
+<p>We evaluate on five spurious-correlation benchmarks (Waterbirds, CelebA, ISIC skin lesions, Undersampled MNIST, and a 5-class Colored MNIST) against eight baselines spanning three supervision tiers, from fully group-supervised down to fully unsupervised.</p>
+<p>The headline is that NCT delivers worst-group accuracy competitive with the strongest baselines while sitting in the <em>unsupervised</em> tier, using no group labels at training or validation time, and it is the only method in the comparison whose inference-time architecture exposes the discovered partition. On ISIC it actually leads every supervision tier on AUROC despite using no group labels at all. You no longer have to choose between a robust model and a legible one.</p>
+</section>
+<section id="what-the-tree-actually-learns" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-tree-actually-learns">What the tree actually learns</h2>
+<p>A method that improves worst-group accuracy is useful; a method that <em>shows you why</em> is the goal. NCT's partition is explicit, so we can simply look at it.</p>
+<p>The cleanest view is the iteration-2 capture rate: for each ground-truth subgroup, what fraction of it lands in each leaf. Across every dataset, the same pattern emerges without any supervision: majority subgroups pile into the easy leaves, minority subgroups into the hard leaves.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/capture_iter2.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-2 capture rates. Bar height is the percentage of a subgroup routed to each leaf (mean over five seeds). Majority subgroups concentrate in easy leaves; minority subgroups concentrate in hard leaves.</figcaption>
+</figure>
+</div>
+<p>The hard landbird leaf on Waterbirds catches 82% of the minority landbird-on-water; the hard benign leaf on ISIC isolates 47% of the no-patch lesions, forcing the model off the color-patch shortcut and onto the lesion itself; the hard digit leaf on UMNIST captures 71% of the undersampled digit 8; the blond-male minority on CelebA concentrates at 73% in its hard leaf. The tree is sorting samples by exactly the axis we care about, and it discovered that axis on its own.</p>
+<p>But do the easy and hard heads really rely on <em>different</em> features, or do they just happen to separate the samples? We answer this with attribution maps. The picture is striking: easy leaves lock onto the spurious cue, and hard leaves shift to the genuine class signal.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/attribution.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-2 attribution maps. Easy leaves (left) localize on the spurious cue: the background on Waterbirds, the color-patch artifact on ISIC, the face on CelebA. Hard leaves (right) shift to the real class feature: the bird's body, the lesion, and the hair.</figcaption>
+</figure>
+</div>
+<p>On Waterbirds the easy waterbird head attends to the water and the wake behind the bird; the hard head localizes tightly on the bird's body across both water and forest. On ISIC the easy benign head fixates on the colored marker ring that frames many benign training images, while the hard head centers on the lesion's boundary and ignores the artifact. On CelebA the easy blond head reads the lower face as a gender proxy, and the hard head moves up to the hair, the actual signal, including cases where a cap occludes it. This is the mechanistic evidence that the structural split is meaningful, not cosmetic.</p>
+</section>
+<section id="going-one-level-deeper" class="level2">
+<h2 class="anchored" data-anchor-id="going-one-level-deeper">Going one level deeper</h2>
+<p>Push the tree to a third iteration and the story holds at finer granularity. Each iteration-2 leaf splits again, and the minority subgroups keep concentrating in the hard branch of their own class rather than leaking into the wrong one.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/capture_iter3.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-3 capture rates. The hierarchy refines within each class: bias-aligned subgroups consolidate in easy-easy leaves, while minority subgroups concentrate in their class's hard branch.</figcaption>
+</figure>
+</div>
+<p>The depth that is actually best is dataset-dependent (and sometimes even seed-dependent), which is why NCT selects it per run from its own validation proxy instead of fixing it ahead of time.</p>
+</section>
+<section id="limitations-and-what-is-next" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-and-what-is-next">Limitations and what is next</h2>
+<p>Two honest conditions come with the structural guarantees. First, the routing leans on simplicity bias: if the minority features are themselves easy to learn, difficulty stops being a clean proxy for subgroup identity and the isolation degrades. This is exactly what we see on Undersampled MNIST, the one benchmark where plain training already classifies many minority samples correctly. Second, the unsupervised depth selection rests on a pseudo worst-group accuracy that tracks the true metric well but not perfectly, and can stop early when the proxy collapses faster than reality. Severe class imbalance can amplify both effects.</p>
+<p>Longer term, I am most excited about two directions. One is taking NCT to language, where spurious correlations come from lexical artifacts and demographic markers rather than localizable image regions, to test whether simplicity bias gives the same routing signal under a different feature geometry. The other is enriching the routing rule itself: correctness is the simplest possible difficulty signal, and gradient-based, attribution-based, or representation-disagreement criteria could partition data along axes that correctness alone misses.</p>
+<p>The broader claim we are making is that the latent group structure of a dataset does not have to stay hidden in the weights. It can be recovered as the architecture itself, discovered without supervision and visible at inference.</p>
 </section>
 <section id="try-it" class="level2">
 <h2 class="anchored" data-anchor-id="try-it">Try it</h2>
-<p>The code, scripts, and prepared datasets are available on <a href="https://github.com/agarg-dev/CLVQVAE">GitHub</a>. The pipeline supports RoBERTa, BERT, LLaMA-2-7B, and Qwen2.5-3B-Instruct:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/agarg-dev/CLVQVAE.git</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch transformers neurox scikit-learn numpy pandas matplotlib seaborn wordcloud</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train (configure dataset, layer pair, codebook size, initialization in scripts/main.sh)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/main.sh</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Faithfulness evaluation</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/faithfulness.sh</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># LLM-as-a-judge evaluation and inter-judge agreement</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/llm_judge_evaluation.sh</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/analyze_agreement.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Layer pairs used in the paper: 8 to 12 for BERT/RoBERTa, 28 to 32 for LLaMA-2-7B, 32 to 36 for Qwen2.5-3B.</p>
-</section>
-<section id="limitations-and-whats-next" class="level2">
-<h2 class="anchored" data-anchor-id="limitations-and-whats-next">Limitations and what's next</h2>
-<p>A few honest caveats. Extracting paired activations from multiple layers is memory-hungry, and k-means initialization adds cost that scales with dataset and codebook size, so models beyond ~70B parameters would need further optimization. The perturbation-based faithfulness metric differentiates methods well but is insensitive to hyperparameter changes like temperature, top-k, or codebook size, and the LLM-judge evaluation is sensitive to prompt construction. Finally, the framework trains a separate model per layer pair, and for decoder-only models we use mean-pooled embeddings in place of a CLS token, which may encode somewhat different information.</p>
-<p>Longer term, I'm excited about discrete cross-layer concepts as a building block: tracking how a concept vocabulary evolves across <em>many</em> layer pairs, applying the framework to instruction-tuned and reasoning models, and using discovered concepts for targeted interventions like steering and debiasing.</p>
+<p>The code, training scripts, and dataset setup are on <a href="https://github.com/agarg-dev/Neural-Classification-Trees">GitHub</a>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/agarg-dev/Neural-Classification-Trees.git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The pipeline covers all five benchmarks (Waterbirds, CelebA, ISIC, UMNIST, CMNIST) with the two-phase training, unsupervised depth selection, and per-leaf capture-rate and attribution diagnostics used in the paper.</p>
 </section>
 <section id="citation" class="level2">
 <h2 class="anchored" data-anchor-id="citation">Citation</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">garg2026clvqvae</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>   = {Cross-Layer Discrete Concept Discovery for Interpreting Language Models},</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>  = {Garg, Ankur and Yu, Xuemin and Sajjad, Hassan and Ebrahimi Kahou, Samira},</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span> = {arXiv preprint arXiv:2506.20040},</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">garg2026nct</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>   = {Discovering Latent Groups for Robust Classification},</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>  = {Garg, Ankur and A{<span class="ch">\"</span>i}vodji, Ulrich and Ebrahimi Kahou, Samira and Michalski, Vincent},</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span> = {arXiv preprint arXiv:XXXX.XXXXX},</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>    = {2026}</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 

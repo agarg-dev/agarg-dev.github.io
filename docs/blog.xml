@@ -10,7 +10,152 @@
 <atom:link href="https://agarg-dev.github.io/blog.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.8.26</generator>
-<lastBuildDate>Thu, 11 Jun 2026 06:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 22 Jun 2026 06:00:00 GMT</lastBuildDate>
+<item>
+  <title>Neural Classification Trees: Discovering Latent Groups for Robust Classification</title>
+  <link>https://agarg-dev.github.io/posts/nct/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<!-- TODO: replace the placeholder "#" Paper link below with the arXiv abstract URL once it is live -->
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>This post accompanies our paper <em>Discovering Latent Groups for Robust Classification</em> (with Ulrich Aïvodji, Samira Ebrahimi Kahou, and Vincent Michalski). 📄 Paper (arXiv coming soon) · <a href="https://github.com/agarg-dev/Neural-Classification-Trees">💻 Code</a></p>
+</div>
+</div>
+</div>
+<section id="the-shortcut-problem-and-the-part-nobody-shows-you" class="level2">
+<h2 class="anchored" data-anchor-id="the-shortcut-problem-and-the-part-nobody-shows-you">The shortcut problem, and the part nobody shows you</h2>
+<p>Deep networks love a shortcut. Train an image classifier to tell waterbirds from landbirds and, if almost every waterbird in your data sits on water, the model will quietly learn to read the <em>background</em> instead of the bird. Average accuracy looks great. Then a waterbird shows up in front of a forest and the model confidently calls it a landbird. This is the classic story of <em>spurious correlations</em>, and the failures land hardest on the underrepresented subgroups: the waterbird on land, the blond man, the lesion without the tell-tale marker.</p>
+<p>The research community has built effective tools to mitigate this. Group DRO upweights the worst group, JTT retrains on the errors of an early-stopped model, GEORGE clusters features into pseudo-subgroups, and so on. They work. But they share a blind spot of their own: after all that effort, the final classifier is still opaque about the groups it learned. Ask it which latent subgroup a particular image belongs to, and it has nothing to say. The robustness lives in the parameters; the <em>structure</em> stays invisible.</p>
+<p>That is the gap we set out to close.</p>
+</section>
+<section id="the-idea-make-the-partition-the-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="the-idea-make-the-partition-the-architecture">The idea: make the partition the architecture</h2>
+<p>Most methods treat training difficulty as a <em>transient</em> signal: find the hard samples, upweight them, then throw the partition away. Our bet is that the partition is the interesting part, and it should survive.</p>
+<p><strong>Neural Classification Trees (NCT)</strong> turn difficulty into a tree-shaped architecture. The construction is simple and self-supervised:</p>
+<ol type="1">
+<li>Train the model for a short burst. Some samples get classified correctly (the <em>easy</em> ones), some do not (the <em>hard</em> ones).</li>
+<li>Split each node into two children accordingly: an easy branch for the samples it got right, a hard branch for the ones it got wrong.</li>
+<li>Reuse those routes as the labels for the next iteration, and repeat.</li>
+</ol>
+<p>No subgroup annotations are ever required. The signal driving the whole tree is just correctness. Concretely, with a binary difficulty indicator <img src="https://latex.codecogs.com/png.latex?d%5E%7B(t)%7D_i"> that is 1 when sample <img src="https://latex.codecogs.com/png.latex?i"> is misclassified at iteration <img src="https://latex.codecogs.com/png.latex?t">, the node assignment updates as</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cell%5E%7B(t+1)%7D_i%20=%202%5C,%5Cell%5E%7B(t)%7D_i%20+%20d%5E%7B(t)%7D_i,%0A"></p>
+<p>so every parent node <img src="https://latex.codecogs.com/png.latex?j"> splits into an easy child <img src="https://latex.codecogs.com/png.latex?2j"> and a hard child <img src="https://latex.codecogs.com/png.latex?2j+1">. After <img src="https://latex.codecogs.com/png.latex?T"> iterations, the binary string of easy/hard decisions along the route to a leaf is a compact record of how difficult that sample was to learn. Crucially, this tree is not scaffolding that gets discarded: it <em>is</em> the inference-time model. Each leaf reports both a predicted class and the difficulty path that produced it.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://agarg-dev.github.io/posts/nct/images/nct_architecture.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<figcaption>NCT inference. Backbone features flow through parent-to-child heads across iterations; an argmax over all leaf outputs yields the group label, which encodes both the class and the easy/hard path.</figcaption>
+</figure>
+</div>
+</section>
+<section id="how-the-tree-grows" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-tree-grows">How the tree grows</h2>
+<p>A few design choices turned out to matter more than we expected.</p>
+<p><strong>Routing by correctness.</strong> The split is deterministic and driven entirely by training dynamics: correctly classified samples flow to the easy child, misclassified ones to the hard child. There is no clustering step and no threshold to tune.</p>
+<p><strong>Asymmetric head capacity.</strong> The two children of a split are not built the same way. Easy children, which inherit samples the parent already handles, are a single linear layer. Hard children, which absorb the conflicting cases, get a richer Linear-ReLU-Dropout block. The extra capacity belongs where the difficult features live, and our ablations confirm that putting it on the easy branch instead consistently underperforms.</p>
+<p><strong>Hierarchical feature flow.</strong> Deeper heads do not see raw backbone features; they receive their parent's representation. Specialization therefore compounds down the tree rather than starting over at every level.</p>
+<p><strong>Stability.</strong> Training a hierarchy iteratively risks catastrophic forgetting, where adapting the children destabilizes the parents they depend on. We counter this with an auxiliary loss that keeps the parent representations valid, plus a two-phase schedule: first adapt the new heads with the backbone frozen, then fine-tune the whole network so it can resolve cases that were previously inseparable.</p>
+<p><strong>Knowing when to stop.</strong> A correctness-based tree grows multiplicatively, but not every dataset wants a deep one. NCT decides its own depth without group labels using a pseudo worst-group accuracy criterion with a Wilson-tolerance stopping bound, and folds away hard children that end up with too few samples to be worth a head.</p>
+</section>
+<section id="why-difficulty-is-a-good-compass" class="level2">
+<h2 class="anchored" data-anchor-id="why-difficulty-is-a-good-compass">Why difficulty is a good compass</h2>
+<p>Two pieces of theory motivate the design.</p>
+<p><strong>Misclassified samples are enriched with minorities.</strong> Neural networks tend to learn the simple, prominent feature first (this is the well-documented <em>simplicity bias</em>). When a spurious correlation is strong, that easy feature is the spurious one, so after the first short training burst the model is mostly predicting the spurious attribute rather than the true label. The samples it gets <em>wrong</em> are therefore disproportionately the minority cases where the attribute and label disagree, and the stronger the spurious correlation, the more lopsided that error set becomes. Routing those errors into the hard branch is what concentrates the minority subgroup there.</p>
+<p><strong>One classifier cannot serve two conflicting subgroups.</strong> When the easy and hard subgroups need genuinely different features (the majority is best classified by the background, the minority only by the bird), no single linear classifier is optimal on both at once. We make this precise as an approximation gap: any shared classifier pays a worst-group penalty that a pair of specialists avoids, and that penalty widens as the spurious correlation gets stronger. NCT's separate heads are exactly the specialists that close it.</p>
+</section>
+<section id="does-it-actually-work" class="level2">
+<h2 class="anchored" data-anchor-id="does-it-actually-work">Does it actually work?</h2>
+<p>We evaluate on five spurious-correlation benchmarks (Waterbirds, CelebA, ISIC skin lesions, Undersampled MNIST, and a 5-class Colored MNIST) against eight baselines spanning three supervision tiers, from fully group-supervised down to fully unsupervised.</p>
+<p>The headline is that NCT delivers worst-group accuracy competitive with the strongest baselines while sitting in the <em>unsupervised</em> tier, using no group labels at training or validation time, and it is the only method in the comparison whose inference-time architecture exposes the discovered partition. On ISIC it actually leads every supervision tier on AUROC despite using no group labels at all. You no longer have to choose between a robust model and a legible one.</p>
+</section>
+<section id="what-the-tree-actually-learns" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-tree-actually-learns">What the tree actually learns</h2>
+<p>A method that improves worst-group accuracy is useful; a method that <em>shows you why</em> is the goal. NCT's partition is explicit, so we can simply look at it.</p>
+<p>The cleanest view is the iteration-2 capture rate: for each ground-truth subgroup, what fraction of it lands in each leaf. Across every dataset, the same pattern emerges without any supervision: majority subgroups pile into the easy leaves, minority subgroups into the hard leaves.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://agarg-dev.github.io/posts/nct/images/capture_iter2.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-2 capture rates. Bar height is the percentage of a subgroup routed to each leaf (mean over five seeds). Majority subgroups concentrate in easy leaves; minority subgroups concentrate in hard leaves.</figcaption>
+</figure>
+</div>
+<p>The hard landbird leaf on Waterbirds catches 82% of the minority landbird-on-water; the hard benign leaf on ISIC isolates 47% of the no-patch lesions, forcing the model off the color-patch shortcut and onto the lesion itself; the hard digit leaf on UMNIST captures 71% of the undersampled digit 8; the blond-male minority on CelebA concentrates at 73% in its hard leaf. The tree is sorting samples by exactly the axis we care about, and it discovered that axis on its own.</p>
+<p>But do the easy and hard heads really rely on <em>different</em> features, or do they just happen to separate the samples? We answer this with attribution maps. The picture is striking: easy leaves lock onto the spurious cue, and hard leaves shift to the genuine class signal.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://agarg-dev.github.io/posts/nct/images/attribution.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-2 attribution maps. Easy leaves (left) localize on the spurious cue: the background on Waterbirds, the color-patch artifact on ISIC, the face on CelebA. Hard leaves (right) shift to the real class feature: the bird's body, the lesion, and the hair.</figcaption>
+</figure>
+</div>
+<p>On Waterbirds the easy waterbird head attends to the water and the wake behind the bird; the hard head localizes tightly on the bird's body across both water and forest. On ISIC the easy benign head fixates on the colored marker ring that frames many benign training images, while the hard head centers on the lesion's boundary and ignores the artifact. On CelebA the easy blond head reads the lower face as a gender proxy, and the hard head moves up to the hair, the actual signal, including cases where a cap occludes it. This is the mechanistic evidence that the structural split is meaningful, not cosmetic.</p>
+</section>
+<section id="going-one-level-deeper" class="level2">
+<h2 class="anchored" data-anchor-id="going-one-level-deeper">Going one level deeper</h2>
+<p>Push the tree to a third iteration and the story holds at finer granularity. Each iteration-2 leaf splits again, and the minority subgroups keep concentrating in the hard branch of their own class rather than leaking into the wrong one.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://agarg-dev.github.io/posts/nct/images/capture_iter3.png" class="img-fluid figure-img"></p>
+<figcaption>Iteration-3 capture rates. The hierarchy refines within each class: bias-aligned subgroups consolidate in easy-easy leaves, while minority subgroups concentrate in their class's hard branch.</figcaption>
+</figure>
+</div>
+<p>The depth that is actually best is dataset-dependent (and sometimes even seed-dependent), which is why NCT selects it per run from its own validation proxy instead of fixing it ahead of time.</p>
+</section>
+<section id="limitations-and-what-is-next" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-and-what-is-next">Limitations and what is next</h2>
+<p>Two honest conditions come with the structural guarantees. First, the routing leans on simplicity bias: if the minority features are themselves easy to learn, difficulty stops being a clean proxy for subgroup identity and the isolation degrades. This is exactly what we see on Undersampled MNIST, the one benchmark where plain training already classifies many minority samples correctly. Second, the unsupervised depth selection rests on a pseudo worst-group accuracy that tracks the true metric well but not perfectly, and can stop early when the proxy collapses faster than reality. Severe class imbalance can amplify both effects.</p>
+<p>Longer term, I am most excited about two directions. One is taking NCT to language, where spurious correlations come from lexical artifacts and demographic markers rather than localizable image regions, to test whether simplicity bias gives the same routing signal under a different feature geometry. The other is enriching the routing rule itself: correctness is the simplest possible difficulty signal, and gradient-based, attribution-based, or representation-disagreement criteria could partition data along axes that correctness alone misses.</p>
+<p>The broader claim we are making is that the latent group structure of a dataset does not have to stay hidden in the weights. It can be recovered as the architecture itself, discovered without supervision and visible at inference.</p>
+</section>
+<section id="try-it" class="level2">
+<h2 class="anchored" data-anchor-id="try-it">Try it</h2>
+<p>The code, training scripts, and dataset setup are on <a href="https://github.com/agarg-dev/Neural-Classification-Trees">GitHub</a>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">git</span> clone https://github.com/agarg-dev/Neural-Classification-Trees.git</span></code></pre></div></div>
+<p>The pipeline covers all five benchmarks (Waterbirds, CelebA, ISIC, UMNIST, CMNIST) with the two-phase training, unsupervised depth selection, and per-leaf capture-rate and attribution diagnostics used in the paper.</p>
+</section>
+<section id="citation" class="level2">
+<h2 class="anchored" data-anchor-id="citation">Citation</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb2-1"><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">@article</span>{<span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">garg2026nct</span>,</span>
+<span id="cb2-2">  <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">title</span>   = {Discovering Latent Groups for Robust Classification},</span>
+<span id="cb2-3">  <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">author</span>  = {Garg, Ankur and A{<span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\"</span>i}vodji, Ulrich and Ebrahimi Kahou, Samira and Michalski, Vincent},</span>
+<span id="cb2-4">  <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">journal</span> = {arXiv preprint arXiv:XXXX.XXXXX},</span>
+<span id="cb2-5">  <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">year</span>    = {2026}</span>
+<span id="cb2-6">}</span></code></pre></div></div>
+
+
+</section>
+
+ ]]></description>
+  <category>robustness</category>
+  <category>interpretability</category>
+  <category>spurious correlations</category>
+  <category>research</category>
+  <guid>https://agarg-dev.github.io/posts/nct/</guid>
+  <pubDate>Mon, 22 Jun 2026 06:00:00 GMT</pubDate>
+  <media:content url="https://agarg-dev.github.io/posts/nct/images/nct_architecture.png" medium="image" type="image/png" height="85" width="144"/>
+</item>
 <item>
   <title>CLVQ-VAE: Discovering Discrete Concepts Across Transformer Layers</title>
   <link>https://agarg-dev.github.io/posts/clvqvae/</link>
@@ -49,7 +194,7 @@
 <p><strong>CLVQ-VAE</strong> (Cross-Layer Vector Quantized Variational Autoencoder) answers this by acting as a <em>transcoder with a discrete bottleneck</em>. It takes activations from a lower layer, forces them through a finite codebook of vectors, and reconstructs the activations of a higher layer. Whatever survives the bottleneck, the codebook vectors that get used, are by construction the concepts essential to the cross-layer transformation. Duplicated residual-stream features collapse onto a single codebook entry instead of showing up over and over, and unlike SAEs, each input maps to <em>one</em> discrete concept vector rather than a linear combination of active neurons.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://agarg-dev.github.io/images/clvq_vae.png" class="img-fluid figure-img" style="width:85.0%"></p>
+<p><img src="https://agarg-dev.github.io/posts/clvqvae/images/clvq_vae.png" class="img-fluid figure-img" style="width:85.0%"></p>
 <figcaption>Overview of the CLVQ-VAE framework: lower-layer activations pass through an adaptive residual encoder, get discretized into concept vectors by the quantizer, and a transformer decoder reconstructs the higher-layer representation.</figcaption>
 </figure>
 </div>
@@ -121,14 +266,14 @@
 <p>My favorite qualitative finding came from the <em>failure</em> cases. In one false negative, a positive review praised actors for a "dead-on mockery" and "decent imitation", and the salient concept lit up with <em>lifted, fake, parody, imitation, ripped</em>. The model had bound imitation-words to negative sentiment and couldn't distinguish criticism of unoriginality from praise of a good impersonation. That's exactly the kind of mechanistic insight into model errors that interpretability tools should surface.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://agarg-dev.github.io/images/FN.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<p><img src="https://agarg-dev.github.io/posts/clvqvae/images/FN.png" class="img-fluid figure-img" style="width:60.0%"></p>
 <figcaption>A false negative: the model misreads a positive review of a "decent imitation" as negative. The salient concept's word cloud (parody, fake, lifted, imitation, ripped) reveals that the model bound imitation-words to negative sentiment.</figcaption>
 </figure>
 </div>
 <p>The method is just as legible when the model is <em>right</em>. For a correctly predicted negative review, the salient concept collects unambiguous markers of absence and negation (nothing, barely, none, whatsoever, hardly, neither), a coherent "deficiency" concept that maps cleanly onto the model's call.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://agarg-dev.github.io/images/TN.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<p><img src="https://agarg-dev.github.io/posts/clvqvae/images/TN.png" class="img-fluid figure-img" style="width:60.0%"></p>
 <figcaption>A true negative: the salient concept for a correctly predicted negative review clusters negation and absence words such as nothing, barely, none, whatsoever, and hardly.</figcaption>
 </figure>
 </div>
@@ -209,7 +354,7 @@ font-style: inherit;">year</span>    = {2026}</span>
   <category>research</category>
   <guid>https://agarg-dev.github.io/posts/clvqvae/</guid>
   <pubDate>Thu, 11 Jun 2026 06:00:00 GMT</pubDate>
-  <media:content url="https://agarg-dev.github.io/images/clvq_vae.png" medium="image" type="image/png" height="55" width="144"/>
+  <media:content url="https://agarg-dev.github.io/posts/clvqvae/images/clvq_vae.png" medium="image" type="image/png" height="55" width="144"/>
 </item>
 </channel>
 </rss>

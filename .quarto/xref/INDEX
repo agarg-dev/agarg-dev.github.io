@@ -16,5 +16,8 @@
   },
   "cv.qmd": {
     "cv.html": "fe713fd3"
+  },
+  "posts/nct/index.qmd": {
+    "index.html": "2fcde2fd"
   }
 }

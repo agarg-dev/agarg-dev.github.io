@@ -5,13 +5,32 @@ title: "Research"
 ## Selected Publications
 
 ::: {.selected-pub}
+### **Discovering Latent Groups for Robust Classification (NCT)**
+*Under Review* [[PDF (arXiv coming soon)](#), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
+
+:::: {layout="[45, 55]"}
+
+::: {#first-column}
+![](posts/nct/images/nct_architecture.png)
+:::
+
+::: {#second-column}
+We introduce **NCT (Neural Classification Trees)**, a framework for robustness to spurious correlations that encodes subgroup structure directly in a tree-shaped architecture. By routing each sample to an *easy* or *hard* branch based on prediction correctness and reusing those routes as pseudo-labels, NCT isolates minority subgroups without any group supervision. Across five benchmarks it matches state-of-the-art worst-group accuracy while being the only method whose inference-time architecture exposes the discovered partition, with hard branches consistently capturing minority subgroups (e.g. **82%** of minority landbirds-on-water on Waterbirds).
+:::
+
+::::
+:::
+
+---
+
+::: {.selected-pub}
 ### **Cross-Layer Discrete Concept Discovery (CLVQ-VAE)**
 *Under Review* [[PDF](https://arxiv.org/abs/2506.20040), [Code](https://github.com/agarg-dev/CLVQVAE), [Blog post](blog.html)]
 
 :::: {layout="[45, 55]"}
 
 ::: {#first-column}
-![](images/clvq_vae.png)
+![](posts/clvqvae/images/clvq_vae.png)
 :::
 
 ::: {#second-column}
@@ -24,6 +43,10 @@ We introduce **CLVQ-VAE**, a framework that interprets Large Language Models by 
 ---
 
 ## All Publications
+
+* **Discovering Latent Groups for Robust Classification**
+  <br> **Ankur Garg**, Ulrich Aïvodji, Samira Ebrahimi Kahou, Vincent Michalski. *(Under Review)*. 2026.
+  <br> [[PDF (arXiv coming soon)](#), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
 
 * **Cross-Layer Discrete Concept Discovery for Interpreting Language Models**
   <br> **Ankur Garg**, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. *(Under Review)*. 2025. arXiv:2506.20040.
