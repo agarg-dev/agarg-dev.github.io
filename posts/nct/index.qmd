@@ -11,10 +11,9 @@ format:
     code-fold: false
 ---
 
-<!-- TODO: replace the placeholder "#" Paper link below with the arXiv abstract URL once it is live -->
 ::: {.callout-note appearance="simple"}
 This post accompanies our paper *Discovering Latent Groups for Robust Classification* (with Ulrich Aïvodji, Samira Ebrahimi Kahou, and Vincent Michalski).
-[📄 Paper (arXiv coming soon)](#) · [💻 Code](https://github.com/agarg-dev/Neural-Classification-Trees)
+[📄 Paper](https://arxiv.org/abs/2606.23609) · [💻 Code](https://github.com/agarg-dev/Neural-Classification-Trees)
 :::
 
 ## The shortcut problem, and the part nobody shows you
@@ -121,7 +120,7 @@ The pipeline covers all five benchmarks (Waterbirds, CelebA, ISIC, UMNIST, CMNIS
 @article{garg2026nct,
   title   = {Discovering Latent Groups for Robust Classification},
   author  = {Garg, Ankur and A{\"i}vodji, Ulrich and Ebrahimi Kahou, Samira and Michalski, Vincent},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  journal = {arXiv preprint arXiv:2606.23609},
   year    = {2026}
 }
 ```

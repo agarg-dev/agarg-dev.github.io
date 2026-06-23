@@ -6,7 +6,7 @@ title: "Research"
 
 ::: {.selected-pub}
 ### **Discovering Latent Groups for Robust Classification (NCT)**
-*Under Review* [[PDF (arXiv coming soon)](#), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
+*Under Review* [[PDF](https://arxiv.org/abs/2606.23609), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
 
 :::: {layout="[45, 55]"}
 
@@ -45,8 +45,8 @@ We introduce **CLVQ-VAE**, a framework that interprets Large Language Models by 
 ## All Publications
 
 * **Discovering Latent Groups for Robust Classification**
-  <br> **Ankur Garg**, Ulrich Aïvodji, Samira Ebrahimi Kahou, Vincent Michalski. *(Under Review)*. 2026.
-  <br> [[PDF (arXiv coming soon)](#), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
+  <br> **Ankur Garg**, Ulrich Aïvodji, Samira Ebrahimi Kahou, Vincent Michalski. *(Under Review)*. 2026. arXiv:2606.23609.
+  <br> [[PDF](https://arxiv.org/abs/2606.23609), [Code](https://github.com/agarg-dev/Neural-Classification-Trees), [Blog post](posts/nct/index.html)]
 
 * **Cross-Layer Discrete Concept Discovery for Interpreting Language Models**
   <br> **Ankur Garg**, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. *(Under Review)*. 2025. arXiv:2506.20040.

@@ -20,14 +20,13 @@
 
 
 
-<!-- TODO: replace the placeholder "#" Paper link below with the arXiv abstract URL once it is live -->
 <div class="callout callout-style-simple callout-note">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-body-container">
-<p>This post accompanies our paper <em>Discovering Latent Groups for Robust Classification</em> (with Ulrich Aïvodji, Samira Ebrahimi Kahou, and Vincent Michalski). 📄 Paper (arXiv coming soon) · <a href="https://github.com/agarg-dev/Neural-Classification-Trees">💻 Code</a></p>
+<p>This post accompanies our paper <em>Discovering Latent Groups for Robust Classification</em> (with Ulrich Aïvodji, Samira Ebrahimi Kahou, and Vincent Michalski). <a href="https://arxiv.org/abs/2606.23609">📄 Paper</a> · <a href="https://github.com/agarg-dev/Neural-Classification-Trees">💻 Code</a></p>
 </div>
 </div>
 </div>
@@ -138,7 +137,7 @@ background-color: null;
 font-style: inherit;">\"</span>i}vodji, Ulrich and Ebrahimi Kahou, Samira and Michalski, Vincent},</span>
 <span id="cb2-4">  <span class="dt" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">journal</span> = {arXiv preprint arXiv:XXXX.XXXXX},</span>
+font-style: inherit;">journal</span> = {arXiv preprint arXiv:2606.23609},</span>
 <span id="cb2-5">  <span class="dt" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">year</span>    = {2026}</span>
