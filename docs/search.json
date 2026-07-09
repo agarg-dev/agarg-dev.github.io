@@ -102,7 +102,7 @@
     "href": "research.html#all-publications",
     "title": "Research",
     "section": "All Publications",
-    "text": "All Publications\n\nDiscovering Latent Groups for Robust Classification  Ankur Garg, Ulrich Aïvodji, Samira Ebrahimi Kahou, Vincent Michalski. (Under Review). 2026. arXiv:2606.23609.  [PDF, Code, Blog post]\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Ankur Garg, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. (Under Review). 2025. arXiv:2506.20040.  [PDF, Code, Blog post]\nImproving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning  Abhishek Rajora, Ankur Garg, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.  AI in Medicine Symposium: BEYOND THE ALGORITHM and Annual Alberta Biomedical Engineering Conference, 2025.  Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to 87.07% (vs 83.21% baseline).\nHandwritten Text to Editable Text Document  Ankur Garg, Payal Deora, D. Malathi. 2020. International Journal of Advanced Science and Technology, Vol. 29, No. 2, pp. 4707-4712.  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
+    "text": "All Publications\n\nDiscovering Latent Groups for Robust Classification  Ankur Garg, Ulrich Aïvodji, Samira Ebrahimi Kahou, Vincent Michalski. (Under Review). 2026. arXiv:2606.23609.  [PDF, Code, Blog post]\nCross-Layer Discrete Concept Discovery for Interpreting Language Models  Ankur Garg, Xuemin Yu, Hassan Sajjad, Samira Ebrahimi Kahou. (Under Review). 2025. arXiv:2506.20040.  [PDF, Code, Blog post]\nImproving Pathology Foundation Models for Brain Tissue using Parameter Efficient Fine-tuning  Abhishek Rajora, Ankur Garg, Eugene Vorontsov, Ana Nikolic, Samira Ebrahimi Kahou.  AI in Medicine Symposium: BEYOND THE ALGORITHM and Annual Alberta Biomedical Engineering Conference, 2025.  [Abstract (p. 145)]  Proposed a parameter-efficient adaptation (LoRA) of the Virchow2 foundation model to address domain shift in brain histopathology. Integrated the CHIEF pipeline to select diagnostically relevant tiles, improving accuracy on the TDBTA dataset to 87.07% (vs 83.21% baseline).\nHandwritten Text to Editable Text Document  Ankur Garg, Payal Deora, D. Malathi. ICECEIC 2019. ISBN 978-1-7281-0173-6.  Developed an image preprocessing pipeline using adaptive thresholding and skew correction. Implemented novel line and word segmentation techniques to achieve 84% accuracy on a 1,000-word test dataset."
   },
   {
     "objectID": "research.html#research-projects",
@@ -207,21 +207,21 @@
     "href": "index.html#news",
     "title": "Ankur Garg",
     "section": "News",
-    "text": "News\n\nJun 2026: Submitted “Discovering Latent Groups for Robust Classification” (NCT) and wrote an accompanying blog post.\nJun 2026: Wrote a blog post explaining our CLVQ-VAE interpretability framework.\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery”.\nOct 2025: Presented our work “Improving Pathology Foundation Models for Brain Tissue” at the AI in Medicine Symposium and the Alberta BME Conference.\nSep 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
+    "text": "News\n\nJun 2026: Submitted “Discovering Latent Groups for Robust Classification” (NCT) and wrote an accompanying blog post.\nJun 2026: Wrote a blog post explaining our CLVQ-VAE interpretability framework.\nDec 2025: Submitted our paper “Cross-Layer Discrete Concept Discovery”.\nOct 2025: Presented our work “Improving Pathology Foundation Models for Brain Tissue” at the AI in Medicine Symposium and the Alberta BME Conference.\nJan 2025: Started my PhD at the University of Calgary.\nMar 2023: Completed my tenure as a Software Engineer at Salesforce."
   },
   {
-    "objectID": "index.html#teaching-academic-service",
-    "href": "index.html#teaching-academic-service",
+    "objectID": "index.html#service-teaching-outreach",
+    "href": "index.html#service-teaching-outreach",
     "title": "Ankur Garg",
-    "section": "Teaching & Academic Service",
-    "text": "Teaching & Academic Service\nI am an active reviewer for Transactions on Machine Learning Research (TMLR).\nI have served as a teaching assistant for the following courses:\n\nApplied Machine Learning and Predictive Analytics (ENEL 682), Winter 2025 & 2026, University of Calgary\nDatabase Systems (CSCI 585), Fall 2021, USC (Course Producer)"
+    "section": "Service, Teaching & Outreach",
+    "text": "Service, Teaching & Outreach\nOrganizing\n\nCo-organizer, Decoding Decisions: Explainability in ML & Sequential Decision Making Workshop, CRV 2025\nCo-organizer, TAIH Symposium 2026 (Transdisciplinary AI Hub), University of Calgary\n\nReviewing\n\nReviewer, Transactions on Machine Learning Research (TMLR)\nReviewer, Conference on Language Modeling (COLM)\nReviewer, ELLIS PhD Program (2025)\n\nTeaching\n\nTeaching Assistant, Applied Machine Learning and Predictive Analytics (ENEL 682), University of Calgary, Winter 2025 & 2026\nCourse Producer, Database Systems (CSCI 585), USC, Fall 2021\n\nOutreach\n\nInstructor, Mission Science Program, 2020-2021\nStudent Mentor, Robotics Coding Academy (USC STEM Outreach), 2020"
   },
   {
     "objectID": "index.html#scholarships-awards",
     "href": "index.html#scholarships-awards",
     "title": "Ankur Garg",
     "section": "Scholarships & Awards",
-    "text": "Scholarships & Awards\n\nEyes High Doctoral Recruitment Scholarship (2025 – 2029)  A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential."
+    "text": "Scholarships & Awards\n\nFaculty of Graduate Studies Doctoral Scholarship, $15,000, University of Calgary, 2026\nEyes High Doctoral Recruitment Scholarship, $26,000/year, University of Calgary, 2025-2029\nESE Graduate Research Award (2025-2026), $700, University of Calgary, 2025\nESE Graduate Research Award (2024-2025), $1,100, University of Calgary, 2025\nSRM Performance Scholarship, tuition rebate, SRM Institute, 2016-2017"
   },
   {
     "objectID": "cv.html",

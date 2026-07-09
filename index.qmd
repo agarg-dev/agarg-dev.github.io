@@ -32,20 +32,37 @@ Previously, I was a Software Engineer at **Salesforce** and a Researcher at **Ha
 * **Jun 2026:** Wrote a [blog post](blog.html) explaining our CLVQ-VAE interpretability framework.
 * **Dec 2025:** Submitted our paper *"Cross-Layer Discrete Concept Discovery"*.
 * **Oct 2025:** Presented our work *"Improving Pathology Foundation Models for Brain Tissue"* at the [AI in Medicine Symposium](https://cumming.ucalgary.ca/office/ofd/events-and-programming/ai-medicine-symposium-beyond-algorithm) and the [Alberta BME Conference](https://schulich.ucalgary.ca/biomedical/news-events/annual-alberta-biomedical-engineering-conference).
-* **Sep 2025:** Started my PhD at the University of Calgary.
+* **Jan 2025:** Started my PhD at the University of Calgary.
 * **Mar 2023:** Completed my tenure as a Software Engineer at Salesforce.
 
 
-## Teaching & Academic Service
+## Service, Teaching & Outreach
 
-I am an active reviewer for **Transactions on Machine Learning Research (TMLR)**.
+**Organizing**
 
-I have served as a teaching assistant for the following courses:
+* Co-organizer, [Decoding Decisions: Explainability in ML & Sequential Decision Making](https://dd-xml.github.io/) Workshop, CRV 2025
+* Co-organizer, [TAIH Symposium 2026](https://uofc-taih.github.io/symposium-2026/) (Transdisciplinary AI Hub), University of Calgary
 
-* **Applied Machine Learning and Predictive Analytics (ENEL 682)**, Winter 2025 & 2026, University of Calgary
-* **Database Systems (CSCI 585)**, Fall 2021, USC *(Course Producer)*
+**Reviewing**
+
+* Reviewer, Transactions on Machine Learning Research (TMLR)
+* Reviewer, Conference on Language Modeling (COLM)
+* Reviewer, ELLIS PhD Program (2025)
+
+**Teaching**
+
+* Teaching Assistant, Applied Machine Learning and Predictive Analytics (ENEL 682), University of Calgary, Winter 2025 & 2026
+* Course Producer, Database Systems (CSCI 585), USC, Fall 2021
+
+**Outreach**
+
+* Instructor, Mission Science Program, 2020-2021
+* Student Mentor, Robotics Coding Academy (USC STEM Outreach), 2020
 
 ## Scholarships & Awards
 
-* **Eyes High Doctoral Recruitment Scholarship** (2025 – 2029)
-  <br> A competitive four-year scholarship awarded by the University of Calgary for academic excellence and research potential.
+* **Faculty of Graduate Studies Doctoral Scholarship**, $15,000, University of Calgary, 2026
+* **Eyes High Doctoral Recruitment Scholarship**, $26,000/year, University of Calgary, 2025-2029
+* **ESE Graduate Research Award (2025-2026)**, $700, University of Calgary, 2025
+* **ESE Graduate Research Award (2024-2025)**, $1,100, University of Calgary, 2025
+* **SRM Performance Scholarship**, tuition rebate, SRM Institute, 2016-2017
